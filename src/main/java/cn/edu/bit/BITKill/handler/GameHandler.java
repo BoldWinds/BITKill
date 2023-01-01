@@ -16,11 +16,12 @@ public class GameHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         // 进行具体的消息处理, 包括json解析 路由等
+
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-
+        System.out.println("There is an exception in session: "+session.getId());
     }
 
     @Override
