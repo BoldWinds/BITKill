@@ -1,5 +1,8 @@
 package cn.edu.bit.BITKill.model;
 
+import lombok.Data;
+
+@Data
 public class User {
     private String username;
 
@@ -63,4 +66,11 @@ public class User {
     public void setAge(String age) {
         this.age = age;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("username: %s, password: %s, sex: %s, age: %s", username, password, sex, age);
+    }
+
 }
