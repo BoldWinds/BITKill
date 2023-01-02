@@ -11,8 +11,12 @@ import java.util.List;
 @Component
 public class UserDaoImpl implements UserDao{
 
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserDaoImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void saveUser(User user) {

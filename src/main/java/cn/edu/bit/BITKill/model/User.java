@@ -66,4 +66,11 @@ public class User {
     public void setAge(String age) {
         this.age = age;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("username: %s, password: %s, sex: %s, age: %s", username, password, sex, age);
+    }
+
 }

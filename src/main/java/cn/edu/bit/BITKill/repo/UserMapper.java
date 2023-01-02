@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserMapper{
 
     //插入
-    @Insert(value = "INSERT INTO user_table(username, password, sex, age) VALUES(#{username}, #{password), #{sex}, #{age}")
+    @Insert(value = "INSERT INTO user_table(username, password, sex, age) VALUES(#{username}, #{password}, #{sex}, #{age})")
     Integer insert_user(User user);
 
     //查询
