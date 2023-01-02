@@ -1,5 +1,8 @@
 package cn.edu.bit.BITKill.model;
 
+import lombok.Data;
+
+@Data
 public class User {
     private String username;
 

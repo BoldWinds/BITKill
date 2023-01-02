@@ -16,7 +16,7 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public void saveUser(User user) {
-
+        userRepository.insert(user);
     }
 
     @Override
@@ -26,16 +26,19 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public User getUser(String username) {
-        return null;
+
+        return userRepository.selectName(username);
     }
 
     @Override
     public List<User> getUsers() {
+
         return null;
     }
 
     @Override
     public List<User> getAllUsers() {
-        return null;
+
+        return userRepository.selectAll();
     }
 }
