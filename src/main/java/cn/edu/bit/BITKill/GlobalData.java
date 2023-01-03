@@ -8,17 +8,37 @@ import java.util.List;
 
 public class GlobalData {
 
+    static private long nextRoomId = 1;
+
     static private List<Room> rooms = new ArrayList<>();
 
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
 
-    static public void addRoom(Room room){
-        rooms.add(room);
+    public static long getNextRoomId() {
+        return nextRoomId;
     }
 
-    //static public void removeRoom()
+    static public void addRoom(Room room){
+        rooms.add(room);
+        nextRoomId++;
+    }
 
-    // 用户登录，给Map添加<username,ID>对
+    static public void removeRoom(long roomId){
+        for(int i=0;i<rooms.size();i++){
+            if(rooms.get(i).roomID == roomId){
+                rooms.remove(i);
+                return;
+            }
+        }
+    }
+
+    // 获取房间列表
+    public static List<Room> getRooms() {
+        return rooms;
+    }
+
+
+    // 用户登录，给Map添加<username,ID>对1
     static public void userLogin(String username,WebSocketSession session){
         userSessionMap.put(username,session);
     }

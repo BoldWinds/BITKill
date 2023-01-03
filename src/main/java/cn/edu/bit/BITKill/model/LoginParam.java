@@ -1,20 +1,11 @@
 package cn.edu.bit.BITKill.model;
 
-public class RegisterParam {
-
-    private final String type = "register";
+public class LoginParam {
+    private final String type = "login";
 
     private String username;
 
     private String password;
-
-    public RegisterParam() {
-    }
-
-    public RegisterParam(String name, String password, String sex, String age) {
-        this.username = name;
-        this.password = password;
-    }
 
     public String getUsername() {
         return username;
@@ -32,4 +23,8 @@ public class RegisterParam {
         this.password = password;
     }
 
+    public LoginParam(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }
