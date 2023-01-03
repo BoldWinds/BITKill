@@ -1,7 +1,7 @@
 package cn.edu.bit.BITKill.repo;
 
 
-import cn.edu.bit.BITKill.model.User;
+import cn.edu.bit.BITKill.model.UserParam;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -12,19 +12,19 @@ import java.util.List;
 public interface UserMapper{
 
     //插入
-    @Insert(value = "INSERT INTO user_table(username, password, sex, age) VALUES(#{username}, #{password}, #{sex}, #{age})")
-    Integer insert_user(User user);
+    @Insert(value = "INSERT INTO user_table(username, password) VALUES(#{username}, #{password})")
+    Integer insert_user(UserParam user);
 
     //查询
     @Select(value = "SELECT * FROM user_table WHERE username=#{username}")
-    User select_name(String username);
+    UserParam select_name(String username);
 
     @Select(value = "SELECT * FROM user_table")
-    List<User> select_all();
+    List<UserParam> select_all();
 
     //修改
-    @Update(value = "UPDATE user_table SET password=#{password}, sex=#{sex}, age=#{age} WHERE username=#{username}")
-    Integer update_user(User user);
+    @Update(value = "UPDATE user_table SET password=#{password} WHERE username=#{username}")
+    Integer update_user(UserParam user);
 
     //删除
     @Delete(value = "DELETE FROM user_table WHERE username=#{username}")

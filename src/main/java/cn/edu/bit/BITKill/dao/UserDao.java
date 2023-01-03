@@ -1,18 +1,18 @@
 package cn.edu.bit.BITKill.dao;
 
-import cn.edu.bit.BITKill.model.User;
+import cn.edu.bit.BITKill.model.UserParam;
 
 import java.util.List;
 
 public interface UserDao {
 
-    public void saveUser(User user);
+    public void saveUser(UserParam user);
 
-    public User getUser(long id);
+    public UserParam getUser(long id);
 
-    public User getUser(String username);
-    public List<User> getUsers();
+    public UserParam getUser(String username);
+    public List<UserParam> getUsers();
 
-    public List<User> getAllUsers();
+    public List<UserParam> getAllUsers();
 
 }

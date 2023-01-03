@@ -2,8 +2,6 @@ package cn.edu.bit.BITKill.model;
 
 public class CreateRoomParam {
 
-    private final String type = "create room";
-
     private String creator;
 
     public String getCreator() {

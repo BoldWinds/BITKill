@@ -1,4 +1,4 @@
-package cn.edu.bit.BITKill;
+package cn.edu.bit.BITKill.model;
 
 import org.springframework.web.socket.WebSocketSession;
 

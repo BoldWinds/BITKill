@@ -1,9 +1,8 @@
 package cn.edu.bit.BITKill.dao;
 
-import cn.edu.bit.BITKill.model.User;
+import cn.edu.bit.BITKill.model.UserParam;
 import cn.edu.bit.BITKill.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,29 +18,29 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public void saveUser(User user) {
+    public void saveUser(UserParam user) {
         userRepository.insert(user);
     }
 
     @Override
-    public User getUser(long id) {
+    public UserParam getUser(long id) {
         return null;
     }
 
     @Override
-    public User getUser(String username) {
+    public UserParam getUser(String username) {
 
         return userRepository.selectName(username);
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<UserParam> getUsers() {
 
         return null;
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserParam> getAllUsers() {
 
         return userRepository.selectAll();
     }

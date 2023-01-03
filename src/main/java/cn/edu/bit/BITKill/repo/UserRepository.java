@@ -1,6 +1,6 @@
 package cn.edu.bit.BITKill.repo;
 
-import cn.edu.bit.BITKill.model.User;
+import cn.edu.bit.BITKill.model.UserParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,22 +17,22 @@ public class UserRepository {
         this.user_mapper = mapper;
     }
 
-    public boolean insert(User user)
+    public boolean insert(UserParam user)
     {
         return user_mapper.insert_user(user) > 0;
     }
 
-    public User selectName(String username)
+    public UserParam selectName(String username)
     {
         return user_mapper.select_name(username);
     }
 
-    public List<User> selectAll()
+    public List<UserParam> selectAll()
     {
         return user_mapper.select_all();
     }
 
-    public boolean updateUser(User user)
+    public boolean updateUser(UserParam user)
     {
         return user_mapper.update_user(user) > 0;
     }

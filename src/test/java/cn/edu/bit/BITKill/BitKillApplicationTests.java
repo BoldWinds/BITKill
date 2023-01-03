@@ -1,13 +1,12 @@
 package cn.edu.bit.BITKill;
 
-import cn.edu.bit.BITKill.model.User;
+import cn.edu.bit.BITKill.model.UserParam;
 import cn.edu.bit.BITKill.repo.UserRepository;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -20,21 +19,21 @@ class BitKillApplicationTests {
 	@Test
 	void repoTest()
 	{
-		List<User> test1 = user_repository.selectAll();
-		boolean test2_1 = user_repository.insert(new User("aaa", "bbb", "male", "5555"));
-		boolean test2_2 = user_repository.insert(new User("ddd", "eee", "female", "6666"));
+		List<UserParam> test1 = user_repository.selectAll();
+		boolean test2_1 = user_repository.insert(new UserParam("aaa", "bbb"));
+		boolean test2_2 = user_repository.insert(new UserParam("ddd", "eee"));
 		Assertions.assertTrue(test2_1);
 		Assertions.assertTrue(test2_2);
-		User test3 = user_repository.selectName("aaa");
+		UserParam test3 = user_repository.selectName("aaa");
 		Assertions.assertEquals("username: aaa, password: bbb, sex: male, age: 5555", test3.toString());
-		boolean test4 = user_repository.updateUser(new User("ddd", "fff", "female", "4444"));
+		boolean test4 = user_repository.updateUser(new UserParam("ddd", "fff"));
 		Assertions.assertTrue(test4);
 		test3 = user_repository.selectName("ddd");
 		Assertions.assertEquals("username: ddd, password: fff, sex: female, age: 4444", test3.toString());
 		boolean test5_1 = user_repository.deleteUser("aaa");
 		boolean test5_2 = user_repository.deleteUser("ddd");
 		Assertions.assertTrue(test5_1);
-		List<User> test6 = user_repository.selectAll();
+		List<UserParam> test6 = user_repository.selectAll();
 		return;
 	}
 

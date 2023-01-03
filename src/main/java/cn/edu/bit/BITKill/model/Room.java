@@ -1,6 +1,5 @@
-package cn.edu.bit.BITKill;
+package cn.edu.bit.BITKill.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
