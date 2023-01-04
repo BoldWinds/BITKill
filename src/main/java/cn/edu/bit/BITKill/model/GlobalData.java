@@ -12,17 +12,20 @@ public class GlobalData {
 
     static private List<Room> rooms = new ArrayList<>();
 
+    // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
 
     public static long getNextRoomId() {
         return nextRoomId;
     }
 
+    // 添加房间
     static public void addRoom(Room room){
         rooms.add(room);
         nextRoomId++;
     }
 
+    // 删除房间
     static public void removeRoom(long roomId){
         for(int i=0;i<rooms.size();i++){
             if(rooms.get(i).roomID == roomId){
@@ -49,7 +52,7 @@ public class GlobalData {
     }
 
     // 通过用户名获取对应sessionID
-    static public WebSocketSession getSessionID(String username){
+    static public WebSocketSession getSessionByUsername(String username){
         return userSessionMap.get(username);
     }
 
