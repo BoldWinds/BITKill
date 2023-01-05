@@ -18,13 +18,12 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public void saveUser(UserParam user) {
-        userRepository.insert(user);
-    }
-
-    @Override
-    public UserParam getUser(long id) {
-        return null;
+    public boolean saveUser(UserParam user) {
+        if(getUser(user.getUsername()) != null)
+        {
+            return false;
+        }
+        return userRepository.insert(user);
     }
 
     @Override
@@ -34,14 +33,17 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public List<UserParam> getUsers() {
-
-        return null;
+    public List<UserParam> getAllUsers() {
+        return userRepository.selectAll();
     }
 
     @Override
-    public List<UserParam> getAllUsers() {
+    public boolean updateUser(UserParam user) {
+        return userRepository.updateUser(user);
+    }
 
-        return userRepository.selectAll();
+    @Override
+    public boolean deleteUser(String username) {
+        return userRepository.deleteUser(username);
     }
 }

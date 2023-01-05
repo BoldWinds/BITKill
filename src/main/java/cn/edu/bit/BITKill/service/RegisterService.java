@@ -17,8 +17,7 @@ public class RegisterService {
     // 注册成功返回true，失败返回false
     public boolean register(UserParam userParam){
         //io可使用虚拟线程，但是虚拟线程的抽象层级还没想好，后面再加
-        userDaoImpl.saveUser(userParam);
-        return false;
+        return userDaoImpl.saveUser(userParam);
     }
 
 }
