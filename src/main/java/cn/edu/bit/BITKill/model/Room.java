@@ -8,6 +8,11 @@ public class Room {
 
     private String creator;
 
+    private String roomName;
+
+    // 为""则代表没有密码
+    private String password;
+
     private int playerCount;
 
     // 保存房间中玩家的username
@@ -17,6 +22,20 @@ public class Room {
 
     private boolean full;
 
+
+    public Room() {
+    }
+
+    public Room(long roomID, String creator, String roomName, String password, int playerCount, List<String> players, boolean gaming, boolean full) {
+        this.roomID = roomID;
+        this.creator = creator;
+        this.roomName = roomName;
+        this.password = password;
+        this.playerCount = playerCount;
+        this.players = players;
+        this.gaming = gaming;
+        this.full = full;
+    }
 
     // 玩家进入该房间
     public void addPlayer(String username){
@@ -68,5 +87,21 @@ public class Room {
 
     public void setFull(boolean full) {
         this.full = full;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

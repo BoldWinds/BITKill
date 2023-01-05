@@ -1,9 +1,8 @@
 package cn.edu.bit.BITKill.model;
 
-public class CreateRoomResp {
-
+public class roomIDParam {
+    // 仅存放一个roomID
     private long roomID;
-
 
     public long getRoomID() {
         return roomID;
@@ -13,7 +12,6 @@ public class CreateRoomResp {
         this.roomID = roomID;
     }
 
-    public CreateRoomResp(long roomID) {
-        this.roomID = roomID;
+    public roomIDParam() {
     }
 }

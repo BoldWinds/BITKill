@@ -45,7 +45,7 @@ public class CommonResp<T> {
     public CommonResp() {
         this.type = "error";
         this.success = false;
-        this.message = "error";
+        this.message = "An internal error occurred";
         this.content = null;
     }
 

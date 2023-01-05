@@ -4,7 +4,7 @@ public class CommonParam<T> {
 
     private String type;
 
-    private  T content;
+    private T content;
 
     public String getType() {
         return type;
