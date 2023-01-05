@@ -1,8 +1,10 @@
 package cn.edu.bit.BITKill.config;
 
 import cn.edu.bit.BITKill.handler.GameHandler;
+import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
+import cn.edu.bit.BITKill.service.RoomService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
@@ -20,9 +22,15 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final LoginService loginService;
 
-    public WebSocketConfig(RegisterService registerService, LoginService loginService) {
+    private final RoomService roomService;
+
+    private final GameService gameService;
+
+    public WebSocketConfig(RegisterService registerService, LoginService loginService, RoomService roomService, GameService gameService) {
         this.registerService = registerService;
         this.loginService = loginService;
+        this.roomService = roomService;
+        this.gameService = gameService;
     }
 
     @Override
@@ -42,7 +50,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler gameHandler() {
-        return new GameHandler(registerService,loginService);
+        return new GameHandler(registerService,loginService,roomService,gameService);
     }
 
 

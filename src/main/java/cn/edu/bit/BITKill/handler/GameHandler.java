@@ -5,8 +5,10 @@ import cn.edu.bit.BITKill.model.CommonParam;
 import cn.edu.bit.BITKill.model.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import cn.edu.bit.BITKill.model.UserParam;
+import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
+import cn.edu.bit.BITKill.service.RoomService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.*;
@@ -19,9 +21,15 @@ public class GameHandler extends TextWebSocketHandler {
     private final RegisterService registerService;
     private final LoginService loginService;
 
-    public GameHandler(RegisterService registerService, LoginService loginService) {
+    private final RoomService roomService;
+
+    private final GameService gameService;
+
+    public GameHandler(RegisterService registerService, LoginService loginService, RoomService roomService, GameService gameService) {
         this.registerService = registerService;
         this.loginService = loginService;
+        this.roomService = roomService;
+        this.gameService = gameService;
     }
 
     @Override
