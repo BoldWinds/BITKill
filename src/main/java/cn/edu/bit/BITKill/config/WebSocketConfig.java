@@ -3,7 +3,6 @@ package cn.edu.bit.BITKill.config;
 import cn.edu.bit.BITKill.handler.GameHandler;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
