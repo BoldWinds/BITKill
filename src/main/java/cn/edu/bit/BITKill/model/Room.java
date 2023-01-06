@@ -22,6 +22,16 @@ public class Room {
 
     private boolean full;
 
+    // 玩家进入该房间
+    public void addPlayer(String username){
+        players.add(username);
+    }
+
+    // 玩家退出房间
+    public void removePlayer(String username){
+        players.remove(username);
+    }
+
 
     public Room() {
     }
@@ -36,18 +46,6 @@ public class Room {
         this.gaming = gaming;
         this.full = full;
     }
-
-    // 玩家进入该房间
-    public void addPlayer(String username){
-        players.add(username);
-    }
-
-    // 玩家退出房间
-    public void removePlayer(String username){
-        players.remove(username);
-    }
-
-
 
     public String getCreator() {
         return creator;

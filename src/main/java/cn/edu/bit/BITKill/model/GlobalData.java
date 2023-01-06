@@ -15,6 +15,8 @@ public class GlobalData {
     // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
 
+    static private List<Game> games = new ArrayList<>();
+
     public static long getNextRoomId() {
         return nextRoomId;
     }
@@ -35,11 +37,67 @@ public class GlobalData {
         }
     }
 
+    // 添加游戏
+    static public void addGame(Game game){
+        games.add(game);
+    }
+
+    // 删除游戏
+    static public void removeGame(long roomId){
+        for (int i = 0; i<games.size(); i++){
+            if(games.get(i).roomID == roomId){
+                games.remove(i);
+                return;
+            }
+        }
+    }
+
     // 获取房间列表
     public static List<Room> getRooms() {
         return rooms;
     }
 
+    // 根据ID号获取Room
+    public static Room getRoomByID(long roomID){
+        for (int i = 0;i<rooms.size(); i++){
+            if(rooms.get(i).roomID == roomID){
+                return rooms.get(i);
+            }
+        }
+        return null;
+    }
+
+    // 根据ID号设置Room
+    public static boolean setRoomByID(long roomID,Room room){
+        for (int i = 0;i<rooms.size(); i++){
+            if(rooms.get(i).roomID == roomID){
+                rooms.set(i,room);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 根据ID号获取Game
+    public static Game getGameByID(long roomID){
+        for (int i = 0;i<games.size(); i++){
+            if(games.get(i).roomID == roomID){
+                return games.get(i);
+            }
+        }
+        return null;
+    }
+
+    // 根据ID号设置Game
+    public static boolean setGameByID(long roomID,Game game){
+        for (int i = 0;i<games.size(); i++){
+            if(games.get(i).roomID == roomID){
+                games.set(i,game);
+                return true;
+            }
+        }
+        return false;
+    }
 
     // 用户登录，给Map添加<username,ID>对1
     static public void userLogin(String username,WebSocketSession session){
@@ -55,8 +113,5 @@ public class GlobalData {
     static public WebSocketSession getSessionByUsername(String username){
         return userSessionMap.get(username);
     }
-
-
-
 
 }
