@@ -1,5 +1,6 @@
 package cn.edu.bit.BITKill.model;
 
+import cn.edu.bit.BITKill.util.PrintHelper;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
@@ -11,16 +12,16 @@ public class GlobalData {
 
     static private long nextRoomId = 1;
 
+    // 程序维护的所有Room列表
     static private List<Room> rooms = new ArrayList<>();
+
+    // 程序维护的所有Game列表
+    static private List<Game> games = new ArrayList<>();
+
+//    static private List<GameControl> gameControls = new ArrayList<>();
 
     // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
-
-    static private List<Game> games = new ArrayList<>();
-
-    public static long getNextRoomId() {
-        return nextRoomId;
-    }
 
     // 添加房间
     static public void addRoom(Room room){
@@ -38,9 +39,10 @@ public class GlobalData {
         }
     }
 
-    // 添加游戏
+    // 添加游戏, 同时设置对应房间的字段
     static public void addGame(Game game){
         games.add(game);
+        //gameControls.add();
     }
 
     // 删除游戏
@@ -48,9 +50,15 @@ public class GlobalData {
         for (int i = 0; i<games.size(); i++){
             if(games.get(i).roomID == roomId){
                 games.remove(i);
-                return;
+                break;
             }
         }
+        /*for (int i = 0; i<gameControls.size(); i++){
+            if(gameControls.get(i).roomID == roomId){
+                gameControls.remove(i);
+                return;
+            }
+        }*/
     }
 
     // 获取房间列表
@@ -90,7 +98,7 @@ public class GlobalData {
     }
 
     // 根据ID号设置Game
-    public static boolean setGameByID(long roomID,Game game){
+    public static boolean setGameByID(long roomID, Game game){
         for (int i = 0;i<games.size(); i++){
             if(games.get(i).roomID == roomID){
                 games.set(i,game);
@@ -125,5 +133,19 @@ public class GlobalData {
             }
         }
         return null;
+    }
+
+    public static long getNextRoomId() {
+        return nextRoomId;
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "roomID=" + getNextRoomId() +
+                ", rooms=" + PrintHelper.list2String(rooms)  +
+                ", games=" + PrintHelper.list2String(games)+
+                ", userSessionMap=" + userSessionMap +
+                '}';
     }
 }

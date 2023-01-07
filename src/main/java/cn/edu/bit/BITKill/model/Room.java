@@ -1,5 +1,10 @@
 package cn.edu.bit.BITKill.model;
 
+import cn.edu.bit.BITKill.util.PrintHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.util.List;
 
 public class Room {
@@ -111,5 +116,19 @@ public class Room {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "roomID=" + roomID +
+                ", creator='" + creator + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", password='" + password + '\'' +
+                ", playerCount=" + playerCount +
+                ", players=" + PrintHelper.list2String(players) +
+                ", gaming=" + gaming +
+                ", full=" + full +
+                '}';
     }
 }
