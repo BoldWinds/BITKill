@@ -48,6 +48,7 @@ public class SendHelper {
         }
     }
 
+    // 向List中除了except对应用户发送response
     public static boolean sendMessageByListExcept(List<String> users, CommonResp response, String except)
     {
         // 先确定所有用户都在可以发送的状态
@@ -69,5 +70,9 @@ public class SendHelper {
             sendMessageBySession(GlobalData.getSessionByUsername(users.get(i)),response);
         }
         return true;
+    }
+
+    public static void sendErrorMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsBytes(new CommonResp<>())));
     }
 }

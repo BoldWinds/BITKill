@@ -4,19 +4,17 @@ package cn.edu.bit.BITKill.handler;
 import cn.edu.bit.BITKill.model.CommonParam;
 import cn.edu.bit.BITKill.model.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
-import cn.edu.bit.BITKill.model.UserParam;
 import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
 import cn.edu.bit.BITKill.service.RoomService;
 import cn.edu.bit.BITKill.util.SendHelper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.IOException;
-
+@Slf4j
 public class GameHandler extends TextWebSocketHandler {
 
     private final RegisterService registerService;
@@ -75,12 +73,14 @@ public class GameHandler extends TextWebSocketHandler {
                 case "game start":
                     gameService.startGame(session,paramJson);
                     break;
+                case "kill":
+                    gameService.kill(session,paramJson);
+                    break;
                 default:
             }
-
-
         }catch (Exception e) {
             SendHelper.sendMessageBySession(session,new CommonResp());
+            log.warn("Something wrong happens when ");
         }
 
     }
