@@ -25,11 +25,21 @@ public class Room {
     // 玩家进入该房间
     public void addPlayer(String username){
         players.add(username);
+        playerCount++;
+        if(playerCount >= 7)
+        {
+            full = true;
+        }
     }
 
     // 玩家退出房间
     public void removePlayer(String username){
         players.remove(username);
+        playerCount--;
+        if(playerCount < 7)
+        {
+            full = false;
+        }
     }
 
 

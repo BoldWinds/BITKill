@@ -5,6 +5,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GlobalData {
 
@@ -114,4 +115,15 @@ public class GlobalData {
         return userSessionMap.get(username);
     }
 
+    static public String getUsernameBySession(WebSocketSession session)
+    {
+        for (Map.Entry<String, WebSocketSession> entry : userSessionMap.entrySet())
+        {
+            if(entry.getValue().equals(session))
+            {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 }

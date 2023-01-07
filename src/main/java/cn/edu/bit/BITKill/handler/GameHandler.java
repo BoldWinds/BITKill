@@ -57,23 +57,19 @@ public class GameHandler extends TextWebSocketHandler {
                     handleLogin(session,paramJson);
                     break;
                 case "create room":
+                    roomService.createRoom(session, paramJson);
                     break;
-
                 case  "get rooms":
-
+                    roomService.getRooms(session, paramJson);
                     break;
-
                 case "get a room":
-
+                    roomService.getARoom(session, paramJson);
                     break;
-
-
                 case "join room":
-
+                    roomService.joinRoom(session, paramJson);
                     break;
-
                 case "leave room":
-
+                    roomService.leaveRoom(session, paramJson);
                     break;
                 default:
             }
@@ -94,7 +90,16 @@ public class GameHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        System.out.println("session(id : "+session.getId()+") has closed!\n");
+        System.out.println("session(id : "+session.getId()+") has closed!");
+
+        //因一些原因断开连接时，需要查询被断开的连接是否时某个用户对应的，若是，则将该用户登出
+        String user = GlobalData.getUsernameBySession(session);
+        if(user != null)
+        {
+            GlobalData.userLogout(user, session);
+            System.out.println("user " + user + " is logged out due to closing session.");
+        }
+
     }
 
     @Override
