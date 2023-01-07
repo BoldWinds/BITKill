@@ -47,4 +47,27 @@ public class SendHelper {
             return false;
         }
     }
+
+    public static boolean sendMessageByListExcept(List<String> users, CommonResp response, String except)
+    {
+        // 先确定所有用户都在可以发送的状态
+        for (int i=0;i<users.size();i++){
+            if(users.get(i).equals(except))
+            {
+                continue;
+            }
+            if(GlobalData.getSessionByUsername(users.get(i)) == null){
+                return false;
+            }
+        }
+        // 运行到这里说明所有要发送的用户都在线
+        for (int i=0;i<users.size();i++){
+            if(users.get(i).equals(except))
+            {
+                continue;
+            }
+            sendMessageBySession(GlobalData.getSessionByUsername(users.get(i)),response);
+        }
+        return true;
+    }
 }
