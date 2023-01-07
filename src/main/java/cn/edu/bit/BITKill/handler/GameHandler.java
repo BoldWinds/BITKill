@@ -9,6 +9,7 @@ import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
 import cn.edu.bit.BITKill.service.RoomService;
+import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.*;
@@ -51,10 +52,10 @@ public class GameHandler extends TextWebSocketHandler {
         try{
             switch (type){
                 case "register":
-                    handleRegister(session,paramJson);
+                    registerService.register(session,paramJson);
                     break;
                 case "login":
-                    handleLogin(session,paramJson);
+                    loginService.login(session,paramJson);
                     break;
                 case "create room":
                     roomService.createRoom(session, paramJson);
@@ -71,14 +72,15 @@ public class GameHandler extends TextWebSocketHandler {
                 case "leave room":
                     roomService.leaveRoom(session, paramJson);
                     break;
+                case "game start":
+                    gameService.startGame(session,paramJson);
+                    break;
                 default:
             }
 
 
         }catch (Exception e) {
-            CommonResp commonResp = new CommonResp();
-            byte[] respJson = objectMapper.writeValueAsBytes(commonResp);
-            session.sendMessage(new TextMessage(respJson));
+            SendHelper.sendMessageBySession(session,new CommonResp());
         }
 
     }
@@ -107,54 +109,4 @@ public class GameHandler extends TextWebSocketHandler {
         return false;
     }
 
-    private void handleRegister(WebSocketSession session,String paramJson) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        CommonParam<UserParam> registerCommonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<UserParam>>(){});
-        UserParam userParam = registerCommonParam.getContent();
-        if(registerService.register(userParam)){
-            //注册成功
-            CommonResp<Object> regSucResp = new CommonResp<>("register", true, "Registration successful", null);
-            String regSucRespStr = objectMapper.writeValueAsString(regSucResp);
-            //System.out.println(regSucRespStr);
-            session.sendMessage(new TextMessage(regSucRespStr));
-        }else{
-            //注册失败
-            CommonResp<Object> regFailResp = new CommonResp<>("register", false, "Duplicate username", null);
-            String regFailRespStr = objectMapper.writeValueAsString(regFailResp);
-            //System.out.println(regFailRespStr);
-            session.sendMessage(new TextMessage(regFailRespStr));
-        }
-
-    }
-
-    private void handleLogin(WebSocketSession session,String paramJson) throws IOException{
-        ObjectMapper objectMapper = new ObjectMapper();
-        CommonParam<UserParam> loginCommonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<UserParam>>(){});
-        UserParam userParam1 = loginCommonParam.getContent();
-        CommonResp<Object> loginResp = new CommonResp<>("login", true, "Login successful", null);
-        switch (loginService.login(userParam1))
-        {
-            //登录成功
-            case 0:
-                GlobalData.userLogin(userParam1.getUsername(),session);
-                break;
-            //用户名错误
-            case 1:
-                loginResp.setSuccess(false);
-                loginResp.setMessage("Wrong username");
-                break;
-            //密码错误
-            case 2:
-                loginResp.setSuccess(false);
-                loginResp.setMessage("Wrong password");
-                break;
-            //重复登录
-            case 3:
-                loginResp.setSuccess(false);
-                loginResp.setMessage("Already login");
-                break;
-        }
-        String loginRespStr = objectMapper.writeValueAsString(loginResp);
-        session.sendMessage(new TextMessage(loginRespStr));
-    }
 }

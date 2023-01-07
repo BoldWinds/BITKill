@@ -56,7 +56,7 @@ public class RoomService {
     public void getARoom(WebSocketSession session, String paramJson) throws JsonProcessingException {
         //Json解析
         ObjectMapper objectMapper = new ObjectMapper();
-        CommonParam<roomIDParam> param = objectMapper.readValue(paramJson, new TypeReference<CommonParam<roomIDParam>>(){});
+        CommonParam<RoomIDParam> param = objectMapper.readValue(paramJson, new TypeReference<CommonParam<RoomIDParam>>(){});
         long roomID = param.getContent().getRoomID();
 
         //获取Room

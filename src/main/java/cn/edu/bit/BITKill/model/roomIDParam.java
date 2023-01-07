@@ -1,6 +1,6 @@
 package cn.edu.bit.BITKill.model;
 
-public class roomIDParam {
+public class RoomIDParam {
     // 仅存放一个roomID
     private long roomID;
 
@@ -12,6 +12,6 @@ public class roomIDParam {
         this.roomID = roomID;
     }
 
-    public roomIDParam() {
+    public RoomIDParam() {
     }
 }
