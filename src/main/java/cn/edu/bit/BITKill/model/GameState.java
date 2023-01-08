@@ -4,8 +4,8 @@ package cn.edu.bit.BITKill.model;
 public enum GameState{
     START,      // 游戏开始
     KILL,       // 狼人刀人
-    PROPHET,    // 预言家查验
     WITCH,      // 女巫操作
+    PROPHET,    // 预言家查验
     ELECT,      // 选举警长
     VOTE,       // 投票环节
     WORDS,      // 遗言

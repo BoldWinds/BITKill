@@ -18,7 +18,7 @@ public class GlobalData {
     // 程序维护的所有Game列表
     static private List<Game> games = new ArrayList<>();
 
-//    static private List<GameControl> gameControls = new ArrayList<>();
+    static private List<GameControl> gameControls = new ArrayList<>();
 
     // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
@@ -42,10 +42,24 @@ public class GlobalData {
     // 添加游戏, 同时设置对应房间的字段
     static public void addGame(Game game){
         games.add(game);
-        //gameControls.add();
     }
 
-    // 删除游戏
+    // 添加gameControl
+    static public void addGameControl(GameControl gameControl){
+        gameControls.add(gameControl);
+    }
+
+    // 删除gameControl
+    static public void removeGameControl(long roomId){
+        for (int i = 0; i<gameControls.size(); i++){
+            if(gameControls.get(i).roomID == roomId){
+                gameControls.remove(i);
+                break;
+            }
+        }
+    }
+
+    // 删除game
     static public void removeGame(long roomId){
         for (int i = 0; i<games.size(); i++){
             if(games.get(i).roomID == roomId){
@@ -53,12 +67,6 @@ public class GlobalData {
                 break;
             }
         }
-        /*for (int i = 0; i<gameControls.size(); i++){
-            if(gameControls.get(i).roomID == roomId){
-                gameControls.remove(i);
-                return;
-            }
-        }*/
     }
 
     // 获取房间列表
@@ -108,6 +116,27 @@ public class GlobalData {
         return false;
     }
 
+    // 根据ID号获取GameControl
+    public static GameControl getGameControlByID(long roomID){
+        for (int i = 0;i<gameControls.size(); i++){
+            if(gameControls.get(i).roomID == roomID){
+                return gameControls.get(i);
+            }
+        }
+        return null;
+    }
+
+    // 根据ID号设置GameControl
+    public static boolean setGameControlByID(long roomID, GameControl gameControl){
+        for (int i = 0;i<gameControls.size(); i++){
+            if(gameControls.get(i).roomID == roomID){
+                gameControls.set(i,gameControl);
+                return true;
+            }
+        }
+        return false;
+    }
+
     // 用户登录，给Map添加<username,ID>对1
     static public void userLogin(String username,WebSocketSession session){
         userSessionMap.put(username,session);
@@ -144,7 +173,7 @@ public class GlobalData {
         return "Game{" +
                 "roomID=" + getNextRoomId() +
                 ", rooms=" + PrintHelper.list2String(rooms)  +
-                ", games=" + PrintHelper.list2String(games)+
+                ", games=" + PrintHelper.list2String(gameControls)+
                 ", userSessionMap=" + userSessionMap +
                 '}';
     }

@@ -25,6 +25,12 @@ public class Game {
 
     private GameState gameState;
 
+    // 为true代表需要竞选警长
+    boolean electCaptain;
+
+    // 存储女巫剩余的药
+    private Drug drugs;
+
     // 随机分配身份
     // 必须在players正确包含所有玩家, 并且playerCharacterMap包含所有玩家到UNDEF的键值对时才正确
     public void assignCharacters(){
@@ -81,6 +87,17 @@ public class Game {
         return players;
     }
 
+    // 获取某个身份的所有存活玩家
+    public List<String> getAlivePlayersByCharacter(Character character){
+        List<String> players = new ArrayList<>();
+        for (String player : playerCharacterMap.keySet()){
+            if(character == playerCharacterMap.get(player) && playerStateMap.get(player)){
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
     // 构造方法:
     public Game() {
         this.roomID = 1;
@@ -89,6 +106,8 @@ public class Game {
         this.captain = "";
         this.playerStateMap = new HashMap<>();
         this.gameState = GameState.START;
+        this.electCaptain = true;
+        this.drugs = Drug.ALL;
     }
 
     public Game(long roomID) {
@@ -98,15 +117,19 @@ public class Game {
         this.captain = "";
         this.playerStateMap = new HashMap<>();
         this.gameState = GameState.START;
+        this.electCaptain = true;
+        this.drugs = Drug.ALL;
     }
 
-    public Game(long roomID, List<String> players, HashMap<String, Character> playerCharacterMap, String captain, HashMap<String, Boolean> playerStateMap, GameState gameState) {
+    public Game(long roomID, List<String> players, HashMap<String, Character> playerCharacterMap, String captain, HashMap<String, Boolean> playerStateMap, GameState gameState, boolean electCaptain,Drug drugs) {
         this.roomID = roomID;
         this.players = players;
         this.playerCharacterMap = playerCharacterMap;
         this.captain = captain;
         this.playerStateMap = playerStateMap;
         this.gameState = gameState;
+        this.electCaptain = electCaptain;
+        this.drugs = drugs;
     }
 
     // Get and Set Methods:
@@ -148,6 +171,30 @@ public class Game {
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    public long getRoomID() {
+        return roomID;
+    }
+
+    public void setRoomID(long roomID) {
+        this.roomID = roomID;
+    }
+
+    public boolean isElectCaptain() {
+        return electCaptain;
+    }
+
+    public void setElectCaptain(boolean electCaptain) {
+        this.electCaptain = electCaptain;
+    }
+
+    public Drug getDrugs() {
+        return drugs;
+    }
+
+    public void setDrugs(Drug drugs) {
+        this.drugs = drugs;
     }
 
     @Override

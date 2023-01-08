@@ -76,11 +76,14 @@ public class GameHandler extends TextWebSocketHandler {
                 case "kill":
                     gameService.kill(session,paramJson);
                     break;
+                case "witch":
+                    gameService.witch(session,paramJson);
+                    break;
                 default:
             }
         }catch (Exception e) {
             SendHelper.sendMessageBySession(session,new CommonResp());
-            log.warn("Something wrong happens when ");
+            log.warn("Something wrong happens!");
         }
 
     }
