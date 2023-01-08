@@ -1,6 +1,8 @@
-package cn.edu.bit.BITKill.model;
+package cn.edu.bit.BITKill.model.params;
 
-public class ChatMessage {
+import cn.edu.bit.BITKill.model.ChatChannel;
+
+public class MessageParam {
 
     private long roomID;
 
@@ -11,10 +13,10 @@ public class ChatMessage {
 
     private String message;
 
-    public ChatMessage() {
+    public MessageParam() {
     }
 
-    public ChatMessage(long roomID, String username, ChatChannel channel, String message) {
+    public MessageParam(long roomID, String username, ChatChannel channel, String message) {
         this.roomID = roomID;
         this.username = username;
         this.channel = channel;

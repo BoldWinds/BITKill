@@ -1,6 +1,6 @@
 package cn.edu.bit.BITKill;
 
-import cn.edu.bit.BITKill.model.UserParam;
+import cn.edu.bit.BITKill.model.params.UserParam;
 import cn.edu.bit.BITKill.repo.UserRepository;
 
 import org.junit.jupiter.api.Assertions;

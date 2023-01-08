@@ -8,7 +8,7 @@ public class GameControl {
     public long roomID;
 
     // 存储每个用户被投了几票
-    private HashMap<String, Integer> voteMap;
+    private HashMap<String, Double> voteMap;
 
     // 存储哪个用户投了哪个
     private HashMap<String,String> voterTargetMap;
@@ -22,6 +22,9 @@ public class GameControl {
     // 使用毒药/解药/不使用
     private Drug drugType;
 
+    private String banishTarget;
+
+
     public GameControl(long roomID) {
         this.roomID = roomID;
         voteMap = new HashMap<>();
@@ -29,6 +32,7 @@ public class GameControl {
         this.killTarget = "";
         this.witchTarget = "";
         this.drugType = Drug.NONE;
+        this.banishTarget = "";
     }
 
     // 将两个map都置空
@@ -37,13 +41,13 @@ public class GameControl {
         voterTargetMap = new HashMap<>();
     }
 
-    // voter投票给target
-    public void vote(String voter,String target) {
+    // voter投票给target,weight是票权,在放逐投票时警长的weight应为1.5
+    public void vote(String voter,String target,double weight) {
         this.voterTargetMap.put(voter,target);
         if(voteMap.containsKey(target)){
-            voteMap.replace(target,(voteMap.get(target)+1));
+            voteMap.replace(target,(voteMap.get(target)+weight));
         }else{
-            voteMap.put(target,1);
+            voteMap.put(target,weight);
         }
     }
 
@@ -59,11 +63,11 @@ public class GameControl {
         return result;
     }
 
-    public HashMap<String, Integer> getVoteMap() {
+    public HashMap<String, Double> getVoteMap() {
         return voteMap;
     }
 
-    public void setVoteMap(HashMap<String, Integer> voteMap) {
+    public void setVoteMap(HashMap<String, Double> voteMap) {
         this.voteMap = voteMap;
     }
 
@@ -113,5 +117,13 @@ public class GameControl {
 
     public void setDrugType(Drug drugType) {
         this.drugType = drugType;
+    }
+
+    public String getBanishTarget() {
+        return banishTarget;
+    }
+
+    public void setBanishTarget(String banishTarget) {
+        this.banishTarget = banishTarget;
     }
 }

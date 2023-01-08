@@ -1,6 +1,6 @@
-package cn.edu.bit.BITKill.model;
+package cn.edu.bit.BITKill.model.params;
 
-public class Vote {
+public class VoteParam {
 
     private long roomID;
 
@@ -8,10 +8,10 @@ public class Vote {
 
     private String target;
 
-    public Vote() {
+    public VoteParam() {
     }
 
-    public Vote(long roomID, String voter, String target) {
+    public VoteParam(long roomID, String voter, String target) {
         this.roomID = roomID;
         this.voter = voter;
         this.target = target;
