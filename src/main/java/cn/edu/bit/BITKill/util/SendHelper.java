@@ -3,26 +3,29 @@ package cn.edu.bit.BITKill.util;
 import cn.edu.bit.BITKill.model.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 public class SendHelper {
 
     // 将response发给users中的所有用户
     // 若所有用户都发送成功，则返回true；否则返回false
     public static boolean sendMessageByList(List<String> users,CommonResp response){
         // 先确定所有用户都在可以发送的状态
-        for (int i=0;i<users.size();i++){
-            if(GlobalData.getSessionByUsername(users.get(i)) == null){
+        for (String user : users){
+            if (GlobalData.getSessionByUsername(user) == null){
+                log.warn("user: "+ user + "is offline, cannot send message!");
                 return false;
             }
         }
         // 运行到这里说明所有要发送的用户都在线
-        for (int i=0;i<users.size();i++){
-            sendMessageBySession(GlobalData.getSessionByUsername(users.get(i)),response);
+        for (String user : users){
+            sendMessageBySession(GlobalData.getSessionByUsername(user),response);
         }
         return true;
     }
@@ -30,6 +33,7 @@ public class SendHelper {
     public static boolean sendMessageByUsername(String username,CommonResp response){
         WebSocketSession session = GlobalData.getSessionByUsername(username);
         if(session == null){
+            log.warn("user: "+ username + "is offline, cannot send message!");
             return false;
         }else{
             return sendMessageBySession(session,response);
@@ -42,8 +46,11 @@ public class SendHelper {
             ObjectMapper objectMapper = new ObjectMapper();
             byte[] responseJson = objectMapper.writeValueAsBytes(response);
             session.sendMessage(new TextMessage(responseJson));
+            log.info("send message to session: "+session.getId());
             return true;
         }catch (IOException e){
+            e.printStackTrace();
+            log.warn("IOException happens when sending message to session: "+session.getId());
             return false;
         }
     }
