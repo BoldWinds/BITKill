@@ -2,8 +2,8 @@ package cn.edu.bit.BITKill.service;
 
 import cn.edu.bit.BITKill.model.*;
 import cn.edu.bit.BITKill.model.Character;
+import cn.edu.bit.BITKill.model.params.*;
 import cn.edu.bit.BITKill.util.SendHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +12,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
 @Service
 public class GameService {
-    // TODO: 完成游戏流程相关服务
 
     // 处理"game start"
     public void startGame(WebSocketSession session,String paramJson) throws IOException {
@@ -65,18 +63,18 @@ public class GameService {
     // 处理"刀人"
     public void kill(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Vote vote = objectMapper.readValue(paramJson, new TypeReference<CommonParam<Vote>>(){}).getContent();
+        VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>(){}).getContent();
         // 从content中获取信息
-        long roomID = vote.getRoomID();
-        String voter = vote.getVoter();
-        String target = vote.getTarget();
+        long roomID = voteParam.getRoomID();
+        String voter = voteParam.getVoter();
+        String target = voteParam.getTarget();
 
         // 获取gameControl和game
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
 
         // 处理投票逻辑
-        gameControl.vote(voter,target);
+        gameControl.vote(voter,target,1);
 
         // 检测投票是否完成
         if(gameControl.getVoterTargetMap().size() == game.getAlivePlayersByCharacter(Character.WOLF).size()){
@@ -104,7 +102,7 @@ public class GameService {
                     // 预言家已经死亡
                     prophetFinish(game.getPlayers());
                     // TODO: 提醒天亮
-
+                    wakeUp(game);
                 }else{
                     game.setGameState(GameState.PROPHET);
                 }
@@ -114,7 +112,7 @@ public class GameService {
             }
         }
 
-        // 将更新过的gameControl写回
+        // 将更新过的数据写回
         GlobalData.setGameControlByID(roomID,gameControl);
         GlobalData.setGameByID(roomID,game);
     }
@@ -162,6 +160,11 @@ public class GameService {
 
         // 等待5s向全体发送女巫结束
         witchFinish(game.getPlayers());
+        // TODO: 预言家死亡情况, 提醒天亮
+        if (game.getAlivePlayersByCharacter(Character.PROPHET).size() == 0){
+            prophetFinish(game.getPlayers());
+            wakeUp(game);
+        }
 
         // 写回数据
         GlobalData.setGameControlByID(roomID,gameControl);
@@ -169,11 +172,127 @@ public class GameService {
         GlobalData.setGameByID(roomID,game);
     }
 
-    // 处理预言家阶段
-    public void prophet(WebSocketSession session, String paramJson){
+    // 预言家阶段
+    public void prophet(WebSocketSession session, String paramJson) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProphetParam prophetParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<ProphetParam>>() {}).getContent();
+        long roomID = prophetParam.getRoomID();
+        String target = prophetParam.getTarget();
+
+        Game game = GlobalData.getGameByID(roomID);
+        // 获取该角色对应身份
+        Character character = game.getPlayerCharacterMap().get(target);
+
+        SendHelper.sendMessageBySession(session,new CommonResp<ProphetResult>("prophet",true,"check finish",new ProphetResult(target,character)));
+
+        // 至此黑夜结束, 向client发送信息进入白天
+        wakeUp(game);
 
     }
 
+    // 选举警长
+    public void elect(WebSocketSession session,String paramJson) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>(){}).getContent();
+        long roomID = voteParam.getRoomID();
+        String voter = voteParam.getVoter();
+        String target = voteParam.getTarget();
+
+        // 获取gameControl和game
+        GameControl gameControl = GlobalData.getGameControlByID(roomID);
+        Game game = GlobalData.getGameByID(roomID);
+
+        // 处理投票逻辑
+        gameControl.vote(voter,target,1);
+
+        if (gameControl.getVoterTargetMap().size() == game.getPlayers().size()){
+            // 选举完成
+            String result = gameControl.getVoteResult();
+            // 更新game中的对应字段
+            game.setCaptain(result);
+            game.setElectCaptain(false);
+            // 告知所有人警长选举完成
+            SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("elect",true,"elect result",new VoteResult(false,result,gameControl.getVoterTargetMap())));
+            // 清除投票相关的map
+            gameControl.setEmptyMap();
+        }
+        // 将更新过的数据写回
+        GlobalData.setGameControlByID(roomID,gameControl);
+        GlobalData.setGameByID(roomID,game);
+    }
+
+    // 投票淘汰
+    public void vote(WebSocketSession session, String paramJson) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>() {}).getContent();
+        long roomID = voteParam.getRoomID();
+        String voter = voteParam.getVoter();
+        String target = voteParam.getTarget();
+
+        // 获取gameControl和game
+        GameControl gameControl = GlobalData.getGameControlByID(roomID);
+        Game game = GlobalData.getGameByID(roomID);
+
+        // 处理投票逻辑
+        if(voter.equals(game.getCaptain())){
+            gameControl.vote(voter,target,1.5);
+        }else{
+            gameControl.vote(voter,target,1);
+        }
+
+        if (gameControl.getVoterTargetMap().size() == game.getPlayers().size()){
+            // 投票完成
+            String result = gameControl.getVoteResult();
+            gameControl.setBanishTarget(result);
+            // 告知所有人放逐投票完成
+            if(!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("vote",true,"vote result",new VoteResult(false,result,gameControl.getVoterTargetMap())))){
+                // 发送失败
+                SendHelper.sendMessageBySession(session,new CommonResp<>());
+            }
+            // 清除投票相关的map
+            gameControl.setEmptyMap();
+        }
+
+        // 将更新过的数据写回
+        GlobalData.setGameControlByID(roomID,gameControl);
+        GlobalData.setGameByID(roomID,game);
+
+    }
+
+    // 发送消息
+    public void sendMessage(WebSocketSession session,String paramJson) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        MessageParam chatMessage = objectMapper.readValue(paramJson, new TypeReference<CommonParam<MessageParam>>(){}).getContent();
+        long roomID = chatMessage.getRoomID();
+        ChatChannel chatChannel = chatMessage.getChannel();
+
+        Game game = GlobalData.getGameByID(roomID);
+
+        // 根据不同的Channel向不同的玩家发送消息
+        if(chatChannel == ChatChannel.ALL){
+            if (!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>( "send message",true,"Send message successfully",chatMessage))){
+                // 发送失败
+                SendHelper.sendMessageBySession(session,new CommonResp<>());
+            }
+        }else if(chatChannel == ChatChannel.WOLVES){
+            if (!SendHelper.sendMessageByList(game.getPlayersByCharacter(Character.WOLF),new CommonResp<>( "send message",true,"Send message successfully",chatMessage))){
+                // 发送失败
+                SendHelper.sendMessageBySession(session,new CommonResp<>());
+            }
+        }
+    }
+
+    // TODO:发送天亮提醒消息
+    private void wakeUp(Game game){
+
+    }
+
+    // TODO:判断游戏是否结束
+    private boolean judgeEnd(GameControl gameControl,Game game){
+        return false;
+    }
+
+    // 女巫阶段结束
     private void witchFinish(List<String> players){
         try {
             Thread.sleep(5000);
@@ -183,6 +302,7 @@ public class GameService {
         SendHelper.sendMessageByList(players,new CommonResp<>("finish",true,"witch finish",null));
     }
 
+    // 预言家阶段结束
     private void prophetFinish(List<String> players){
         try {
             Thread.sleep(5000);

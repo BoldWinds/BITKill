@@ -1,6 +1,6 @@
 package cn.edu.bit.BITKill.dao;
 
-import cn.edu.bit.BITKill.model.UserParam;
+import cn.edu.bit.BITKill.model.params.UserParam;
 
 import java.util.List;
 

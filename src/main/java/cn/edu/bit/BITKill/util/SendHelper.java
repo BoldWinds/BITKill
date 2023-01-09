@@ -1,6 +1,6 @@
 package cn.edu.bit.BITKill.util;
 
-import cn.edu.bit.BITKill.model.CommonResp;
+import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

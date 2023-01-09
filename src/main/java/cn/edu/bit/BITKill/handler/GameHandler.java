@@ -1,8 +1,8 @@
 package cn.edu.bit.BITKill.handler;
 
 
-import cn.edu.bit.BITKill.model.CommonParam;
-import cn.edu.bit.BITKill.model.CommonResp;
+import cn.edu.bit.BITKill.model.params.CommonParam;
+import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
@@ -82,7 +82,24 @@ public class GameHandler extends TextWebSocketHandler {
                 case "witch":
                     gameService.witch(session,paramJson);
                     break;
+                case "prophet":
+                    gameService.prophet(session,paramJson);
+                    break;
+                case "elect":
+                    gameService.elect(session,paramJson);
+                    break;
+                case "vote":
+                    gameService.vote(session,paramJson);
+                    break;
+                case "send message":
+                    gameService.sendMessage(session,paramJson);
+                    break;
+                case "last words":
+                    // TODO:增加遗言处理
+                    gameService.sendMessage(session,paramJson);
+                    break;
                 default:
+                    SendHelper.sendMessageBySession(session,new CommonResp<>("error",false,"Unknown request!",null));
             }
         }catch (Exception e) {
             SendHelper.sendMessageBySession(session,new CommonResp());

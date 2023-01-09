@@ -1,4 +1,4 @@
-package cn.edu.bit.BITKill.model;
+package cn.edu.bit.BITKill.model.params;
 
 public class CommonResp<T> {
 

@@ -1,4 +1,6 @@
-package cn.edu.bit.BITKill.model;
+package cn.edu.bit.BITKill.model.params;
+
+import cn.edu.bit.BITKill.model.Drug;
 
 public class WitchParam {
     private long roomID;

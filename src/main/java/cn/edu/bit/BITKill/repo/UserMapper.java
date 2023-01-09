@@ -1,7 +1,7 @@
 package cn.edu.bit.BITKill.repo;
 
 
-import cn.edu.bit.BITKill.model.UserParam;
+import cn.edu.bit.BITKill.model.params.UserParam;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 

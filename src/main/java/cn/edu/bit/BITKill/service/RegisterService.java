@@ -1,9 +1,9 @@
 package cn.edu.bit.BITKill.service;
 
 import cn.edu.bit.BITKill.dao.UserDaoImpl;
-import cn.edu.bit.BITKill.model.CommonParam;
-import cn.edu.bit.BITKill.model.CommonResp;
-import cn.edu.bit.BITKill.model.UserParam;
+import cn.edu.bit.BITKill.model.params.CommonParam;
+import cn.edu.bit.BITKill.model.params.CommonResp;
+import cn.edu.bit.BITKill.model.params.UserParam;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package cn.edu.bit.BITKill.model;
+package cn.edu.bit.BITKill.model.params;
 
 // 用于register和login接口
 public class UserParam {
