@@ -70,6 +70,9 @@ public class GameHandler extends TextWebSocketHandler {
                 case "leave room":
                     roomService.leaveRoom(session, paramJson);
                     break;
+                case "get a random room":
+                    roomService.getARandomRoom(session, paramJson);
+                    break;
                 case "game start":
                     gameService.startGame(session,paramJson);
                     break;

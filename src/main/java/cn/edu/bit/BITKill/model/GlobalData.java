@@ -74,6 +74,16 @@ public class GlobalData {
         return rooms;
     }
 
+    //获取一个未满、无密码的房间（用于匹配）
+    public static Room getARandomRoom(){
+        for (int i = 0;i<rooms.size(); i++){
+            if(!rooms.get(i).isFull() && rooms.get(i).getPassword().equals("")){
+                return rooms.get(i);
+            }
+        }
+        return null;
+    }
+
     // 根据ID号获取Room
     public static Room getRoomByID(long roomID){
         for (int i = 0;i<rooms.size(); i++){
