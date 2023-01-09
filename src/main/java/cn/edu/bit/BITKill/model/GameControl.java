@@ -75,6 +75,23 @@ public class GameControl {
         return result;
     }
 
+    // 检测是否平票
+    public boolean isTie(){
+        double maxVote = 0;
+        for(String voter : voteMap.keySet()){
+            if(voteMap.get(voter) > maxVote){
+                maxVote = voteMap.get(voter);
+            }
+        }
+        int tie = 0;
+        for(String voter : voteMap.keySet()){
+            if(voteMap.get(voter) == maxVote){
+                tie ++;
+            }
+        }
+        return tie > 1;
+    }
+
     public HashMap<String, Double> getVoteMap() {
         return voteMap;
     }

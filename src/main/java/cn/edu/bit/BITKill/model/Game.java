@@ -33,6 +33,17 @@ public class Game {
 
     //----------------------------------------------------------------------
 
+    // 获取所有存活的玩家
+    public List<String> getAlivePlayers(){
+        List<String> alivePlayers = new ArrayList<>();
+        for (String u : players){
+            if (playerStateMap.get(u)){
+                alivePlayers.add(u);
+            }
+        }
+        return alivePlayers;
+    }
+
     // 获取该game的赢家，狼人获胜返回WOLF，好人获胜返回VILLAGE，游戏仍未结束返回UNDEF
     public Character judgeEnd(){
 

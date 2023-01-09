@@ -53,10 +53,9 @@ public class GameService {
             SendHelper.sendErrorMessage(session);
         }
 
-        // 将该gameControl放入全局变量中管理
-        GlobalData.addGameControl(gameControl);
+        // 将该game放入全局变量中管理
         game.setGameState(GameState.KILL);
-        GlobalData.addGame(game);
+        GlobalData.addGame(game,gameControl);
 
     }
 
@@ -80,41 +79,50 @@ public class GameService {
         if(gameControl.getVoterTargetMap().size() == game.getAlivePlayersByCharacter(Character.WOLF).size()){
             // 投票完成
             String result = gameControl.getVoteResult();
+            gameControl.setKillTarget(result);
+            game.setGameState(GameState.WITCH);
+
             // 告知狼人投票结果
             SendHelper.sendMessageByList(game.getPlayersByCharacter(Character.WOLF),new CommonResp<>("kill",true,"kill result",new TargetParam(result)));
+
+            // 清除狼人投票map
+            gameControl.setEmptyMap();
+
+            // 等待5s
             try {
-                // 等待5s
                 Thread.sleep(5000);
             }catch (InterruptedException e){
                 log.warn("exception happens when thread sleeps!");
             }
+
             // 向全体发送刀人结束
             SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("finish",true,"kill finish",null));
 
-            // 清除狼人投票map
-            gameControl.setEmptyMap();
-            gameControl.setKillTarget(result);
-
+            //--------------------------------------------------------------------------
+            // 判断女巫、预言家状态, 处理这两位角色死亡的情况
             if(game.getAlivePlayersByCharacter(Character.WITCH).size() == 0){
                 // 女巫已经死亡，需要跳过这一阶段
                 witchFinish(game.getPlayers());
                 if(game.getAlivePlayersByCharacter(Character.PROPHET).size() == 0){
                     // 预言家已经死亡
                     prophetFinish(game.getPlayers());
-                    // TODO: 提醒天亮
-                    wakeUp(game);
+                    // 天亮了
+                    game = wakeUp(gameControl,game);
+                    // 判断游戏是否结束
+                    if (gameEnd(game)){
+                        // 因为游戏结束要把数据从内存中删除，所以不能执行下面的写回，要直接返回
+                        return;
+                    }
                 }else{
                     game.setGameState(GameState.PROPHET);
                 }
             }else{
-                // 向女巫发送刀人结果
+                // 女巫存活，向女巫发送刀人结果
                 SendHelper.sendMessageByList(game.getPlayersByCharacter(Character.WITCH),new CommonResp<>("kill result",true,"kill result",new TargetParam(result)));
             }
         }
-
         // 将更新过的数据写回
-        GlobalData.setGameControlByID(roomID,gameControl);
-        GlobalData.setGameByID(roomID,game);
+        GlobalData.writeBack(roomID,game,gameControl);
     }
 
     // 处理女巫阶段
@@ -129,6 +137,7 @@ public class GameService {
         // 获取gameControl和game
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
+
         Drug drugLeft = game.getDrugs();
 
         if (drug != Drug.NONE){
@@ -136,21 +145,21 @@ public class GameService {
             gameControl.setWitchTarget(target);
             gameControl.setDrugType(drug);
             // 根据女巫使用的药，更新game中的剩余药
-            switch (drug){
-                case POISON:
-                    if(drugLeft == Drug.ALL){
+            switch (drug) {
+                case POISON -> {
+                    if (drugLeft == Drug.ALL) {
                         drugLeft = Drug.ANTIDOTE;
-                    }else{
+                    } else {
                         drugLeft = Drug.NONE;
                     }
-                    break;
-                case  ANTIDOTE:
-                    if(drugLeft == Drug.ALL){
+                }
+                case ANTIDOTE -> {
+                    if (drugLeft == Drug.ALL) {
                         drugLeft = Drug.POISON;
-                    }else{
+                    } else {
                         drugLeft = Drug.NONE;
                     }
-                    break;
+                }
             }
             game.setDrugs(drugLeft);
         }
@@ -160,16 +169,21 @@ public class GameService {
 
         // 等待5s向全体发送女巫结束
         witchFinish(game.getPlayers());
-        // TODO: 预言家死亡情况, 提醒天亮
+        game.setGameState(GameState.PROPHET);
+
+        // 检查预言家状态
         if (game.getAlivePlayersByCharacter(Character.PROPHET).size() == 0){
             prophetFinish(game.getPlayers());
-            wakeUp(game);
+            game = wakeUp(gameControl,game);
+            // 判断游戏是否结束
+            if (gameEnd(game)){
+                // 因为游戏结束要把数据从内存中删除，所以不能执行下面的写回，要直接返回
+                return;
+            }
         }
 
         // 写回数据
-        GlobalData.setGameControlByID(roomID,gameControl);
-        game.setGameState(GameState.PROPHET);
-        GlobalData.setGameByID(roomID,game);
+        GlobalData.writeBack(roomID,game,gameControl);
     }
 
     // 预言家阶段
@@ -180,14 +194,21 @@ public class GameService {
         String target = prophetParam.getTarget();
 
         Game game = GlobalData.getGameByID(roomID);
+        GameControl gameControl = GlobalData.getGameControlByID(roomID);
+
         // 获取该角色对应身份
         Character character = game.getPlayerCharacterMap().get(target);
 
         SendHelper.sendMessageBySession(session,new CommonResp<ProphetResult>("prophet",true,"check finish",new ProphetResult(target,character)));
 
         // 至此黑夜结束, 向client发送信息进入白天
-        wakeUp(game);
-
+        game = wakeUp(gameControl,game);
+        // 判断游戏是否结束
+        if (gameEnd(game)){
+            // 因为游戏结束要把数据从内存中删除，所以不能执行下面的写回，要直接返回
+            return;
+        }
+        GlobalData.writeBack(roomID,game,gameControl);
     }
 
     // 选举警长
@@ -203,16 +224,22 @@ public class GameService {
         Game game = GlobalData.getGameByID(roomID);
 
         // 处理投票逻辑
-        gameControl.vote(voter,target,1);
+        if (target.equals(game.getCaptain())){
+            // 投票人是警长
+            gameControl.vote(voter,target,1.5);
+        }else{
+            gameControl.vote(voter,target,1);
+        }
 
-        if (gameControl.getVoterTargetMap().size() == game.getPlayers().size()){
+        if (gameControl.getVoterTargetMap().size() == game.getAlivePlayers().size()){
             // 选举完成
             String result = gameControl.getVoteResult();
+            boolean tie = gameControl.isTie();
             // 更新game中的对应字段
             game.setCaptain(result);
             game.setElectCaptain(false);
             // 告知所有人警长选举完成
-            SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("elect",true,"elect result",new VoteResult(false,result,gameControl.getVoterTargetMap())));
+            SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("elect",true,"elect result",new VoteResult(tie,result,gameControl.getVoterTargetMap())));
             // 清除投票相关的map
             gameControl.setEmptyMap();
         }
@@ -240,29 +267,36 @@ public class GameService {
             gameControl.vote(voter,target,1);
         }
 
-        if (gameControl.getVoterTargetMap().size() == game.getPlayers().size()){
+        if (gameControl.getVoterTargetMap().size() == game.getAlivePlayers().size()){
             // 投票完成
             String result = gameControl.getVoteResult();
+            boolean tie = gameControl.isTie();
             gameControl.setBanishTarget(result);
             // 告知所有人放逐投票完成
-            if(!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("vote",true,"vote result",new VoteResult(false,result,gameControl.getVoterTargetMap())))){
+            if(!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("vote",true,"vote result",new VoteResult(tie,result,gameControl.getVoterTargetMap())))){
                 // 发送失败
                 SendHelper.sendMessageBySession(session,new CommonResp<>());
             }
             // 清除投票相关的map
             gameControl.setEmptyMap();
+
+            // 检测游戏是否结束
+            if (gameEnd(game)){
+                return;
+            }
         }
 
         // 将更新过的数据写回
-        GlobalData.setGameControlByID(roomID,gameControl);
-        GlobalData.setGameByID(roomID,game);
-
+        GlobalData.writeBack(roomID,game,gameControl);
     }
 
-    // 发送消息
+    // 发送消息和遗言合并在这里
     public void sendMessage(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        MessageParam chatMessage = objectMapper.readValue(paramJson, new TypeReference<CommonParam<MessageParam>>(){}).getContent();
+        CommonParam<MessageParam> commonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<MessageParam>>(){});
+        MessageParam chatMessage = commonParam.getContent();
+        // 获取数据
+        String type = commonParam.getType();
         long roomID = chatMessage.getRoomID();
         ChatChannel chatChannel = chatMessage.getChannel();
 
@@ -270,26 +304,62 @@ public class GameService {
 
         // 根据不同的Channel向不同的玩家发送消息
         if(chatChannel == ChatChannel.ALL){
-            if (!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>( "send message",true,"Send message successfully",chatMessage))){
+            if (!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>( type,true,type+" successfully",chatMessage))){
                 // 发送失败
                 SendHelper.sendMessageBySession(session,new CommonResp<>());
             }
         }else if(chatChannel == ChatChannel.WOLVES){
-            if (!SendHelper.sendMessageByList(game.getPlayersByCharacter(Character.WOLF),new CommonResp<>( "send message",true,"Send message successfully",chatMessage))){
+            if (!SendHelper.sendMessageByList(game.getPlayersByCharacter(Character.WOLF),new CommonResp<>( type,true,type+" successfully",chatMessage))){
                 // 发送失败
                 SendHelper.sendMessageBySession(session,new CommonResp<>());
             }
         }
     }
 
-    // TODO:发送天亮提醒消息
-    private void wakeUp(Game game){
-
+    // 夜晚结束，更新game
+    private Game wakeUp(GameControl gameControl,Game game) {
+        // 更新夜晚所作的事情对游戏产生的影响
+        if (gameControl.getDrugType() == Drug.POISON) {
+            // 女巫使用毒药
+            game.playerDie(gameControl.getKillTarget());
+            game.playerDie(gameControl.getWitchTarget());
+        } else if (gameControl.getDrugType() == Drug.ANTIDOTE && gameControl.getKillTarget().equals(gameControl.getDrugTarget())) {
+            // 女巫使用解药,无人死亡
+        } else {
+            // 女巫不使用药品,狼人击杀目标
+            game.playerDie(gameControl.getKillTarget());
+        }
+        // 设置下一个状态
+        if(game.isElectCaptain()){
+            game.setGameState(GameState.ELECT);
+        }else{
+            game.setGameState(GameState.VOTE);
+        }
+        // 清空gameControl
+        gameControl.clear();
+        // 发送消息
+        CommonResp<Game> resp = new CommonResp<>("night end",true,"night end",game);
+        SendHelper.sendMessageByList(game.getPlayers(),resp);
+        return game;
     }
 
-    // TODO:判断游戏是否结束
-    private boolean judgeEnd(GameControl gameControl,Game game){
-        return false;
+    private boolean gameEnd(Game game){
+        long roomID = game.roomID;
+        Character character = game.judgeEnd();
+        if(character != Character.UNDEF){
+            // 游戏结束
+            SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("game end",true,"game end",new WinnerParam(roomID,character)));
+            // 将相应变量在内存中删除
+            GlobalData.removeGame(roomID);
+            // 将room状态改为不在游戏中
+            Room room = GlobalData.getRoomByID(roomID);
+            room.setGaming(false);
+            GlobalData.setRoomByID(roomID,room);
+            return true;
+        }else {
+            // 游戏未结束
+            return false;
+        }
     }
 
     // 女巫阶段结束

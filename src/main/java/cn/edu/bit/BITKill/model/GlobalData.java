@@ -18,10 +18,14 @@ public class GlobalData {
     // 程序维护的所有Game列表
     static private List<Game> games = new ArrayList<>();
 
+    // 程序维护的所有GameControl列表
     static private List<GameControl> gameControls = new ArrayList<>();
 
     // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
+
+//--------------------------------------------------------------------------------------------
+// 以下是该类的方法:
 
     // 添加房间
     static public void addRoom(Room room){
@@ -39,32 +43,24 @@ public class GlobalData {
         }
     }
 
-    // 添加游戏, 同时设置对应房间的字段
-    static public void addGame(Game game){
+    // 添加game和gameControl
+    static public void addGame(Game game,GameControl gameControl){
         games.add(game);
-    }
-
-    // 添加gameControl
-    static public void addGameControl(GameControl gameControl){
         gameControls.add(gameControl);
     }
 
-    // 删除gameControl
-    static public void removeGameControl(long roomId){
-        for (int i = 0; i<gameControls.size(); i++){
-            if(gameControls.get(i).roomID == roomId){
-                gameControls.remove(i);
-                break;
-            }
-        }
-    }
-
-    // 删除game
+    // 删除game和gameControl
     static public void removeGame(long roomId){
         for (int i = 0; i<games.size(); i++){
             if(games.get(i).roomID == roomId){
                 games.remove(i);
                 break;
+            }
+        }
+        for (int i = 0; i<gameControls.size(); i++){
+            if(gameControls.get(i).roomID == roomId){
+                gameControls.remove(i);
+                return;
             }
         }
     }
@@ -137,6 +133,11 @@ public class GlobalData {
         return false;
     }
 
+    public static void writeBack(long roomID,Game game,GameControl gameControl){
+        setGameByID(roomID,game);
+        setGameControlByID(roomID,gameControl);
+    }
+
     // 用户登录，给Map添加<username,ID>对1
     static public void userLogin(String username,WebSocketSession session){
         userSessionMap.put(username,session);
@@ -174,7 +175,7 @@ public class GlobalData {
                 "roomID=" + getNextRoomId() +
                 ", rooms=" + PrintHelper.list2String(rooms)  +
                 ", games=" + PrintHelper.list2String(gameControls)+
-                ", userSessionMap=" + userSessionMap +
+                ", userSessionMap=" + PrintHelper.map2String(userSessionMap)  +
                 '}';
     }
 }
