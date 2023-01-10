@@ -31,6 +31,44 @@ public class Game {
     // 存储女巫剩余的药
     private Drug drugs;
 
+    //----------------------------------------------------------------------
+
+    // 获取所有存活的玩家
+    public List<String> getAlivePlayers(){
+        List<String> alivePlayers = new ArrayList<>();
+        for (String u : players){
+            if (playerStateMap.get(u)){
+                alivePlayers.add(u);
+            }
+        }
+        return alivePlayers;
+    }
+
+    // 获取该game的赢家，狼人获胜返回WOLF，好人获胜返回VILLAGE，游戏仍未结束返回UNDEF
+    public Character judgeEnd(){
+
+        int wolfAlive = getAlivePlayersByCharacter(Character.WOLF).size();
+        int villageAlive = getAlivePlayersByCharacter(Character.VILLAGE).size();
+        int witchAlive = getAlivePlayersByCharacter(Character.PROPHET).size();
+        int prophetAlive = getAlivePlayersByCharacter(Character.WITCH).size();
+
+        if(wolfAlive == 0){
+            // 狼队全灭
+            return Character.VILLAGE;
+        }else if(villageAlive == 0){
+            // 村民全灭
+            return Character.WOLF;
+        }else if(witchAlive + prophetAlive == 0){
+            // 神职全灭
+            return Character.WOLF;
+        }else if (wolfAlive >= villageAlive + witchAlive + prophetAlive){
+            return Character.WOLF;
+        }else{
+            // 如果游戏还没有结束，则返回UNDEF
+            return Character.UNDEF;
+        }
+    }
+
     // 随机分配身份
     // 必须在players正确包含所有玩家, 并且playerCharacterMap包含所有玩家到UNDEF的键值对时才正确
     public void assignCharacters(){
@@ -45,7 +83,7 @@ public class Game {
         int numVillage = size - 2 - numWolf;
 
         // 遍历HashMap
-        for (String key : playerCharacterMap.keySet()) {
+        for (String key : players) {
             // 生成0到size-1的随机数
             int randomInt = random.nextInt(size);
 
@@ -63,6 +101,7 @@ public class Game {
                 playerCharacterMap.put(key, Character.WITCH);
                 numWitch--;
             }
+            size--;
         }
     }
 
@@ -98,6 +137,12 @@ public class Game {
         return players;
     }
 
+    // 玩家死亡，设置其存活状态
+    public void playerDie(String player){
+        playerStateMap.put(player,false);
+    }
+
+    // -----------------------------------------------------------------------------
     // 构造方法:
     public Game() {
         this.roomID = 1;

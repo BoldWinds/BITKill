@@ -1,5 +1,8 @@
 package cn.edu.bit.BITKill;
 
+import cn.edu.bit.BITKill.model.Drug;
+import cn.edu.bit.BITKill.model.Game;
+import cn.edu.bit.BITKill.model.GameState;
 import cn.edu.bit.BITKill.model.params.UserParam;
 import cn.edu.bit.BITKill.repo.UserRepository;
 
@@ -8,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @SpringBootTest
@@ -36,6 +41,8 @@ class BitKillApplicationTests {
 		List<UserParam> test6 = user_repository.selectAll();
 		return;
 	}
+
+
 
 	@Test
 	void contextLoads() {

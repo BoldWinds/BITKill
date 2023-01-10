@@ -24,9 +24,18 @@ public class GameControl {
 
     private String banishTarget;
 
-
     public GameControl(long roomID) {
         this.roomID = roomID;
+        voteMap = new HashMap<>();
+        voterTargetMap = new HashMap<>();
+        this.killTarget = "";
+        this.witchTarget = "";
+        this.drugType = Drug.NONE;
+        this.banishTarget = "";
+    }
+
+    // 将gameControl设置回默认状态
+    public void clear(){
         voteMap = new HashMap<>();
         voterTargetMap = new HashMap<>();
         this.killTarget = "";
@@ -45,22 +54,42 @@ public class GameControl {
     public void vote(String voter,String target,double weight) {
         this.voterTargetMap.put(voter,target);
         if(voteMap.containsKey(target)){
+            // 已经有人投过
             voteMap.replace(target,(voteMap.get(target)+weight));
         }else{
+            // 还没有人投过target
             voteMap.put(target,weight);
         }
     }
 
     // 获取投票结果
     public String getVoteResult(){
-        int maxVote = 0;
+        double maxVote = 0;
         String result = null;
         for(String voter : voteMap.keySet()){
             if(voteMap.get(voter) > maxVote){
                 result = voter;
+                maxVote = voteMap.get(voter);
             }
         }
         return result;
+    }
+
+    // 检测是否平票
+    public boolean isTie(){
+        double maxVote = 0;
+        for(String voter : voteMap.keySet()){
+            if(voteMap.get(voter) > maxVote){
+                maxVote = voteMap.get(voter);
+            }
+        }
+        int tie = 0;
+        for(String voter : voteMap.keySet()){
+            if(voteMap.get(voter) == maxVote){
+                tie ++;
+            }
+        }
+        return tie > 1;
     }
 
     public HashMap<String, Double> getVoteMap() {

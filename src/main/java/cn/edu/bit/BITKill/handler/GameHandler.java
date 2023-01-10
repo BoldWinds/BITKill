@@ -18,6 +18,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class GameHandler extends TextWebSocketHandler {
 
     private final RegisterService registerService;
+
     private final LoginService loginService;
 
     private final RoomService roomService;
@@ -113,7 +114,7 @@ public class GameHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        System.out.println("There is an exception in session: "+session.getId());
+        log.warn("There is an exception in session: "+session.getId());
     }
 
     @Override
