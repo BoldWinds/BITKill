@@ -6,6 +6,7 @@ import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.params.UserParam;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -21,6 +22,7 @@ public class RegisterService {
         this.userDaoImpl = userDaoImpl;
     }
 
+    @Async
     public void register(WebSocketSession session, String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         CommonParam<UserParam> registerCommonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<UserParam>>(){});

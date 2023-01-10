@@ -1,7 +1,6 @@
 package cn.edu.bit.BITKill.service;
 
 import cn.edu.bit.BITKill.dao.UserDaoImpl;
-import cn.edu.bit.BITKill.model.Room;
 import cn.edu.bit.BITKill.model.params.CommonParam;
 import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
@@ -9,12 +8,12 @@ import cn.edu.bit.BITKill.model.params.UserParam;
 import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class LoginService {
@@ -24,6 +23,7 @@ public class LoginService {
         this.userDaoImpl = userDaoImpl;
     }
 
+    @Async
     public void sendSalt(WebSocketSession session, String paramJson) throws IOException
     {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -51,6 +51,7 @@ public class LoginService {
         return;
     }
 
+    @Async
     public void login(WebSocketSession session, String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         CommonParam<UserParam> loginCommonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<UserParam>>(){});

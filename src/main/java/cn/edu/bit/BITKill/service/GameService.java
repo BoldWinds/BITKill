@@ -7,7 +7,7 @@ import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -20,6 +20,7 @@ import java.util.List;
 public class GameService {
 
     // 处理"game start"
+    @Async
     public void startGame(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         RoomIDParam roomIDParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<RoomIDParam>>(){}).getContent();
@@ -61,6 +62,7 @@ public class GameService {
     }
 
     // 处理"刀人"
+    @Async
     public void kill(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>(){}).getContent();
@@ -127,6 +129,7 @@ public class GameService {
     }
 
     // 处理女巫阶段
+    @Async
     public void witch(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         WitchParam witchParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<WitchParam>>(){}).getContent();
@@ -188,6 +191,7 @@ public class GameService {
     }
 
     // 预言家阶段
+    @Async
     public void prophet(WebSocketSession session, String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ProphetParam prophetParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<ProphetParam>>() {}).getContent();
@@ -213,6 +217,7 @@ public class GameService {
     }
 
     // 选举警长
+    @Async
     public void elect(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>(){}).getContent();
@@ -250,6 +255,7 @@ public class GameService {
     }
 
     // 投票淘汰
+    @Async
     public void vote(WebSocketSession session, String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         VoteParam voteParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<VoteParam>>() {}).getContent();
@@ -292,6 +298,7 @@ public class GameService {
     }
 
     // 发送消息和遗言合并在这里
+    @Async
     public void sendMessage(WebSocketSession session,String paramJson) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         CommonParam<MessageParam> commonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<MessageParam>>(){});
@@ -316,7 +323,6 @@ public class GameService {
             }
         }
     }
-
 
     // 夜晚结束，更新game
     private Game wakeUp(GameControl gameControl,Game game) {
@@ -363,7 +369,6 @@ public class GameService {
             return false;
         }
     }
-
 
     // 女巫阶段结束
     private void witchFinish(List<String> players){

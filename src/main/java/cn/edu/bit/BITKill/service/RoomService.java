@@ -6,6 +6,7 @@ import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -15,8 +16,7 @@ import java.util.List;
 @Service
 public class RoomService {
 
-    //TODO: 完成房间相关API，各个函数的参数还没写
-
+    @Async
     public void createRoom(WebSocketSession session, String paramJson) throws Exception
     {
         //Json解析
@@ -40,6 +40,7 @@ public class RoomService {
         return;
     }
 
+    @Async
     public void getRooms(WebSocketSession session, String paramJson)
     {
         //content = null, 无需Json解析
@@ -54,6 +55,7 @@ public class RoomService {
         return;
     }
 
+    @Async
     public void getARoom(WebSocketSession session, String paramJson) throws JsonProcessingException {
         //Json解析
         ObjectMapper objectMapper = new ObjectMapper();
@@ -73,6 +75,7 @@ public class RoomService {
         return;
     }
 
+    @Async
     public void joinRoom(WebSocketSession session, String paramJson) throws JsonProcessingException
     {
         //Json解析
@@ -127,6 +130,7 @@ public class RoomService {
         return;
     }
 
+    @Async
     public void leaveRoom(WebSocketSession session, String paramJson) throws JsonProcessingException
     {
         //Json解析
@@ -170,6 +174,7 @@ public class RoomService {
         return;
     }
 
+    @Async
     public void getARandomRoom(WebSocketSession session, String paramJson) throws JsonProcessingException
     {
         Room room = GlobalData.getARandomRoom();
