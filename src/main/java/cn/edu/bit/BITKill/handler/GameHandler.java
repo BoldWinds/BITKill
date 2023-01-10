@@ -52,6 +52,9 @@ public class GameHandler extends TextWebSocketHandler {
                 case "register":
                     registerService.register(session,paramJson);
                     break;
+                case "login salt":
+                    loginService.sendSalt(session,paramJson);
+                    break;
                 case "login":
                     loginService.login(session,paramJson);
                     break;

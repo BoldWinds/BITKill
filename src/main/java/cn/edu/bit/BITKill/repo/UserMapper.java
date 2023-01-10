@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserMapper{
 
     //插入
-    @Insert(value = "INSERT INTO user_table(username, password) VALUES(#{username}, #{password})")
+    @Insert(value = "INSERT INTO user_table(username, password, salt) VALUES(#{username}, #{password}, #{salt})")
     Integer insert_user(UserParam user);
 
     //查询
@@ -23,7 +23,7 @@ public interface UserMapper{
     List<UserParam> select_all();
 
     //修改
-    @Update(value = "UPDATE user_table SET password=#{password} WHERE username=#{username}")
+    @Update(value = "UPDATE user_table SET password=#{password}, salt=#{salt} WHERE username=#{username}")
     Integer update_user(UserParam user);
 
     //删除
