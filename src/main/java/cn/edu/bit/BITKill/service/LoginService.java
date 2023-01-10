@@ -1,10 +1,12 @@
 package cn.edu.bit.BITKill.service;
 
 import cn.edu.bit.BITKill.dao.UserDaoImpl;
+import cn.edu.bit.BITKill.model.Room;
 import cn.edu.bit.BITKill.model.params.CommonParam;
 import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import cn.edu.bit.BITKill.model.params.UserParam;
+import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class LoginService {
@@ -19,6 +22,33 @@ public class LoginService {
 
     public LoginService(UserDaoImpl userDaoImpl) {
         this.userDaoImpl = userDaoImpl;
+    }
+
+    public void sendSalt(WebSocketSession session, String paramJson) throws IOException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CommonParam<String> getSaltParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<String>>(){});
+        String userName = getSaltParam.getContent();
+
+        UserParam dbUser = userDaoImpl.getUser(userName);
+        if(dbUser == null)
+        {
+            CommonResp<String> errorResp = new CommonResp<>("login salt", false, "Invalid username", null);
+
+            //发送
+            if(!SendHelper.sendMessageBySession(session, errorResp)){
+                System.out.println("Error at sendSalt: Respond error.\n");
+            };
+
+            return;
+        }
+
+        CommonResp<String> sendSaltResp = new CommonResp<>("login salt", true, "Salt", dbUser.getSalt());
+        //发送
+        if(!SendHelper.sendMessageBySession(session, sendSaltResp)){
+            System.out.println("Error at sendSalt: Respond error.\n");
+        };
+        return;
     }
 
     public void login(WebSocketSession session, String paramJson) throws IOException {

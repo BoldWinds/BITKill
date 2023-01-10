@@ -127,7 +127,8 @@ public class RoomService {
         return;
     }
 
-    public void leaveRoom(WebSocketSession session, String paramJson) throws JsonProcessingException {
+    public void leaveRoom(WebSocketSession session, String paramJson) throws JsonProcessingException
+    {
         //Json解析
         ObjectMapper objectMapper = new ObjectMapper();
         CommonParam<JoinOrLeaveParam> param = objectMapper.readValue(paramJson, new TypeReference<CommonParam<JoinOrLeaveParam>>(){});
@@ -169,4 +170,17 @@ public class RoomService {
         return;
     }
 
+    public void getARandomRoom(WebSocketSession session, String paramJson) throws JsonProcessingException
+    {
+        Room room = GlobalData.getARandomRoom();
+        if(room == null)
+        {
+            CommonResp<Room> errorResp = new CommonResp<>("get a random room", false, "No available room", null);
+            SendHelper.sendMessageBySession(session, errorResp);
+            return;
+        }
+        CommonResp<Room> randomRoomResp = new CommonResp<>("get a random room", true, "Get a random room successfully", room);
+        SendHelper.sendMessageBySession(session, randomRoomResp);
+        return;
+    }
 }
