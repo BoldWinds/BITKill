@@ -29,6 +29,7 @@ public class Room {
 
     // 玩家进入该房间
     public void addPlayer(String username){
+        GlobalData.addUserRoomMap(username, roomID);
         players.add(username);
         playerCount++;
         if(playerCount >= 7)
@@ -39,6 +40,7 @@ public class Room {
 
     // 玩家退出房间
     public void removePlayer(String username){
+        GlobalData.removeUserRoomMap(username);
         players.remove(username);
         playerCount--;
         if(playerCount < 7)
