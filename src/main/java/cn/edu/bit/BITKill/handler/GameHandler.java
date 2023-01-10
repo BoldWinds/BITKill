@@ -4,6 +4,7 @@ package cn.edu.bit.BITKill.handler;
 import cn.edu.bit.BITKill.model.params.CommonParam;
 import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
+import cn.edu.bit.BITKill.model.params.RoomUserParam;
 import cn.edu.bit.BITKill.service.GameService;
 import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
@@ -99,11 +100,10 @@ public class GameHandler extends TextWebSocketHandler {
                     gameService.sendMessage(session,paramJson);
                     break;
                 case "last words":
-                    // TODO:增加遗言处理
                     gameService.sendMessage(session,paramJson);
                     break;
                 default:
-                    SendHelper.sendMessageBySession(session,new CommonResp<>("error",false,"Unknown request!",null));
+                    SendHelper.sendMessageBySession(session,new CommonResp<>("unkonwn request", true,"unkonwn request",null));
             }
         }catch (Exception e) {
             SendHelper.sendMessageBySession(session,new CommonResp());
@@ -123,11 +123,17 @@ public class GameHandler extends TextWebSocketHandler {
 
         //因一些原因断开连接时，需要查询被断开的连接是否时某个用户对应的，若是，则将该用户登出
         String user = GlobalData.getUsernameBySession(session);
-        if(user != null)
-        {
+        if(user != null) {
             GlobalData.userLogout(user, session);
             System.out.println("user " + user + " is logged out due to closing session.");
+
+            // 通知同房间的人该用户离线
+            Long roomID = GlobalData.getUserRoomMap().get(user);
+            if (roomID != null){
+                SendHelper.sendMessageByList(GlobalData.getRoomByID(roomID).getPlayers(),new CommonResp<RoomUserParam>("offline",true,"player offline",new RoomUserParam(roomID,user)));
+            }
         }
+
 
     }
 

@@ -24,6 +24,9 @@ public class GlobalData {
     // 用户名到session的map
     static private HashMap<String, WebSocketSession> userSessionMap = new HashMap<>();
 
+    // 用户名到其所属房间号的map
+    static private HashMap<String, Long> userRoomMap = new HashMap<>();
+
 //--------------------------------------------------------------------------------------------
 // 以下是该类的方法:
 
@@ -175,8 +178,60 @@ public class GlobalData {
         return null;
     }
 
+    // 添加user room对应
+    public static void addUserRoomMap(String user,long roomID){
+        userRoomMap.put(user,roomID);
+    }
+
+    // 移除user room对应
+    public static void removeUserRoomMap(String user){
+        userRoomMap.remove(user);
+    }
+
+
+
     public static long getNextRoomId() {
         return nextRoomId;
+    }
+
+    public static void setNextRoomId(long nextRoomId) {
+        GlobalData.nextRoomId = nextRoomId;
+    }
+
+    public static void setRooms(List<Room> rooms) {
+        GlobalData.rooms = rooms;
+    }
+
+    public static List<Game> getGames() {
+        return games;
+    }
+
+    public static void setGames(List<Game> games) {
+        GlobalData.games = games;
+    }
+
+    public static List<GameControl> getGameControls() {
+        return gameControls;
+    }
+
+    public static void setGameControls(List<GameControl> gameControls) {
+        GlobalData.gameControls = gameControls;
+    }
+
+    public static HashMap<String, Long> getUserRoomMap() {
+        return userRoomMap;
+    }
+
+    public static void setUserRoomMap(HashMap<String, Long> userRoomMap) {
+        GlobalData.userRoomMap = userRoomMap;
+    }
+
+    public static HashMap<String, WebSocketSession> getUserSessionMap() {
+        return userSessionMap;
+    }
+
+    public static void setUserSessionMap(HashMap<String, WebSocketSession> userSessionMap) {
+        GlobalData.userSessionMap = userSessionMap;
     }
 
     @Override

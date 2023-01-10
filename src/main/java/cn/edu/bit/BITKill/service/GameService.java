@@ -7,6 +7,7 @@ import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -316,6 +317,7 @@ public class GameService {
         }
     }
 
+
     // 夜晚结束，更新game
     private Game wakeUp(GameControl gameControl,Game game) {
         // 更新夜晚所作的事情对游戏产生的影响
@@ -361,6 +363,7 @@ public class GameService {
             return false;
         }
     }
+
 
     // 女巫阶段结束
     private void witchFinish(List<String> players){

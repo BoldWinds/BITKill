@@ -4,6 +4,7 @@ import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
