@@ -12,13 +12,13 @@ public class GlobalData {
 
     static private long nextRoomId = 1;
 
-    // 程序维护的所有Room列表
-    static private List<Room> rooms = new ArrayList<>();
+    // 程序维护的所有Room哈希
+    static private HashMap<Long, Room> rooms = new HashMap<>();
 
-    // 程序维护的所有Game列表
+    // 程序维护的所有Game哈希
     static private HashMap<Long,Game> games = new HashMap<>();
 
-    // 程序维护的所有GameControl列表
+    // 程序维护的所有GameControl哈希
     static private HashMap<Long,GameControl> gameControls = new HashMap<>();
 
     // 用户名到session的map
@@ -32,18 +32,13 @@ public class GlobalData {
 
     // 添加房间
     static public void addRoom(Room room){
-        rooms.add(room);
+        rooms.put(nextRoomId,room);
         nextRoomId++;
     }
 
     // 删除房间
     static public void removeRoom(long roomId){
-        for(int i=0;i<rooms.size();i++){
-            if(rooms.get(i).roomID == roomId){
-                rooms.remove(i);
-                return;
-            }
-        }
+        rooms.remove(roomId);
     }
 
     // 添加game和gameControl
@@ -60,14 +55,20 @@ public class GlobalData {
 
     // 获取房间列表
     public static List<Room> getRooms() {
-        return rooms;
+        List<Room> roomList = new ArrayList<>();
+        for (Long key : rooms.keySet()){
+            roomList.add(rooms.get(key));
+        }
+        return roomList;
     }
 
     //获取一个未满、无密码的房间（用于匹配）
     public static Room getARandomRoom(){
-        for (int i = 0;i<rooms.size(); i++){
-            if(!rooms.get(i).isFull() && rooms.get(i).getPassword().equals("")){
-                return rooms.get(i);
+        Room room;
+        for (long key : rooms.keySet()){
+            room = rooms.get(key);
+            if(!room.isFull() && room.getPassword().equals("")){
+                return room;
             }
         }
         return null;
@@ -75,23 +76,12 @@ public class GlobalData {
 
     // 根据ID号获取Room
     public static Room getRoomByID(long roomID){
-        for (int i = 0;i<rooms.size(); i++){
-            if(rooms.get(i).roomID == roomID){
-                return rooms.get(i);
-            }
-        }
-        return null;
+        return rooms.get(roomID);
     }
 
     // 根据ID号设置Room
-    public static boolean setRoomByID(long roomID,Room room){
-        for (int i = 0;i<rooms.size(); i++){
-            if(rooms.get(i).roomID == roomID){
-                rooms.set(i,room);
-                return true;
-            }
-        }
-        return false;
+    public static void setRoomByID(long roomID, Room room){
+        rooms.put(roomID,room);
     }
 
     // 根据ID号获取Game
@@ -106,12 +96,7 @@ public class GlobalData {
 
     // 根据ID号获取GameControl
     public static GameControl getGameControlByID(long roomID){
-        for (int i = 0;i<gameControls.size(); i++){
-            if(gameControls.get(i).roomID == roomID){
-                return gameControls.get(i);
-            }
-        }
-        return null;
+        return gameControls.get(roomID);
     }
 
     // 根据ID号设置GameControl
@@ -170,7 +155,7 @@ public class GlobalData {
         GlobalData.nextRoomId = nextRoomId;
     }
 
-    public static void setRooms(List<Room> rooms) {
+    public static void setRooms(HashMap<Long, Room> rooms) {
         GlobalData.rooms = rooms;
     }
 
@@ -210,7 +195,7 @@ public class GlobalData {
     public String toString() {
         return "Game{" +
                 "roomID=" + getNextRoomId() +
-                ", rooms=" + PrintHelper.list2String(rooms)  +
+                ", rooms=" + PrintHelper.map2String(rooms)  +
                 ", games=" + PrintHelper.map2String(games)+
                 ", userSessionMap=" + PrintHelper.map2String(userSessionMap)  +
                 '}';
