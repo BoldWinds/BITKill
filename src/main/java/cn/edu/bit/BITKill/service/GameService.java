@@ -75,6 +75,23 @@ public class GameService {
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
 
+        // 检查发出请求的client是否是狼人
+        if(game.getPlayerCharacterMap().get(voter) != Character.WOLF){
+            // 不是狼人
+            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong character",null));
+            return;
+        }
+
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong target",null));
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong target",null));
+        }
+
         // 处理投票逻辑
         gameControl.vote(voter,target,1);
 
@@ -142,7 +159,30 @@ public class GameService {
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
 
+        // 检查发出请求的client是否是女巫
+        if(game.getPlayerCharacterMap().get(GlobalData.getUsernameBySession(session)) != Character.WITCH){
+            // 不是女巫
+            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong character",null));
+            return;
+        }
+
         Drug drugLeft = game.getDrugs();
+
+        // 检查女巫是否有该种类型的药品
+        if(drugLeft!=Drug.ALL && drug!=Drug.NONE && drugLeft != drug){
+            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"No such drug",null));
+            return;
+        }
+
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong target",null));
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong target",null));
+        }
 
         if (drug != Drug.NONE){
             // 更新gameControl中的内容
@@ -201,6 +241,23 @@ public class GameService {
         Game game = GlobalData.getGameByID(roomID);
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
 
+        // 检查发出请求的client是否是预言家
+        if(game.getPlayerCharacterMap().get(GlobalData.getUsernameBySession(session)) != Character.PROPHET){
+            // 不是预言家
+            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong character",null));
+            return;
+        }
+
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong target",null));
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong target",null));
+        }
+
         // 获取该角色对应身份
         Character character = game.getPlayerCharacterMap().get(target);
 
@@ -228,6 +285,16 @@ public class GameService {
         // 获取gameControl和game
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
+
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("elect",false,"Wrong target",null));
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("elect",false,"Wrong target",null));
+        }
 
         // 处理投票逻辑
         if (target.equals(game.getCaptain())){
@@ -267,6 +334,16 @@ public class GameService {
         GameControl gameControl = GlobalData.getGameControlByID(roomID);
         Game game = GlobalData.getGameByID(roomID);
 
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("vote",false,"Wrong target",null));
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp("vote",false,"Wrong target",null));
+        }
+
         // 处理投票逻辑
         if(voter.equals(game.getCaptain())){
             gameControl.vote(voter,target,1.5);
@@ -278,7 +355,8 @@ public class GameService {
             // 投票完成
             String result = gameControl.getVoteResult();
             boolean tie = gameControl.isTie();
-            gameControl.setBanishTarget(result);
+           //gameControl.setBanishTarget(result);
+            game.playerDie(result);
             // 告知所有人放逐投票完成
             if(!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("vote",true,"vote result",new VoteResult(tie,result,gameControl.getVoterTargetMap())))){
                 // 发送失败
@@ -306,9 +384,16 @@ public class GameService {
         // 获取数据
         String type = commonParam.getType();
         long roomID = chatMessage.getRoomID();
+        String speaker = chatMessage.getUsername();
         ChatChannel chatChannel = chatMessage.getChannel();
 
         Game game = GlobalData.getGameByID(roomID);
+
+        if (type.equals("send message") && !game.getPlayerStateMap().get(speaker)){
+            // 发送消息的玩家已经4了
+            SendHelper.sendMessageBySession(session,new CommonResp<>("send message",false,"You are dead!",null));
+            return;
+        }
 
         // 根据不同的Channel向不同的玩家发送消息
         if(chatChannel == ChatChannel.ALL){
@@ -351,6 +436,7 @@ public class GameService {
         return game;
     }
 
+    // 游戏结束相应处理，返回的boolean用于告知程序return与否
     private boolean gameEnd(Game game){
         long roomID = game.roomID;
         Character character = game.judgeEnd();
