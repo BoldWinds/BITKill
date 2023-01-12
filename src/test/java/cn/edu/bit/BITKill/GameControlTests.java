@@ -1,6 +1,7 @@
 package cn.edu.bit.BITKill;
 
 import cn.edu.bit.BITKill.model.GameControl;
+import cn.edu.bit.BITKill.util.PrintHelper;
 import org.junit.jupiter.api.Test;
 
 public class GameControlTests {
@@ -17,10 +18,10 @@ public class GameControlTests {
         gameControl.vote("f","d",1);
         gameControl.vote("g","c",1);
 
-        for (String s : gameControl.getVoteMap().keySet()){
-            System.out.println("voter: "+s + "  " + gameControl.getVoteMap().get(s));
-        }
-
+        System.out.println(PrintHelper.map2String(gameControl.getVoteMap()));
         System.out.println(gameControl.getVoteResult());
+        System.out.println(gameControl.isTie());
     }
+
+
 }
