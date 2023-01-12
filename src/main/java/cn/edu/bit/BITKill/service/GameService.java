@@ -37,13 +37,13 @@ public class GameService {
 
         // 正确获取到room, 对game进行设置
         List<String> players = room.getPlayers();
-        int size = players.size();
+
         // 设置玩家
         game.setPlayers(players);
         // 设置玩家初始状态
-        for (int i = 0; i < size; i++){
-            game.addPlayerStateMap(players.get(i),true);
-            game.addPlayerCharacterMap(players.get(i),Character.UNDEF);
+        for (String player : players) {
+            game.addPlayerStateMap(player, true);
+            game.addPlayerCharacterMap(player, Character.UNDEF);
         }
         // 分配身份
         game.assignCharacters();
@@ -78,18 +78,18 @@ public class GameService {
         // 检查发出请求的client是否是狼人
         if(game.getPlayerCharacterMap().get(voter) != Character.WOLF){
             // 不是狼人
-            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong character",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("kill",false,"Wrong character",null));
             return;
         }
 
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("kill",false,"Wrong target",null));
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("kill",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("kill",false,"Wrong target",null));
         }
 
         // 处理投票逻辑
@@ -162,7 +162,7 @@ public class GameService {
         // 检查发出请求的client是否是女巫
         if(game.getPlayerCharacterMap().get(GlobalData.getUsernameBySession(session)) != Character.WITCH){
             // 不是女巫
-            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong character",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"Wrong character",null));
             return;
         }
 
@@ -170,18 +170,18 @@ public class GameService {
 
         // 检查女巫是否有该种类型的药品
         if(drugLeft!=Drug.ALL && drug!=Drug.NONE && drugLeft != drug){
-            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"No such drug",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"No such drug",null));
             return;
         }
 
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"Wrong target",null));
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("witch",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"Wrong target",null));
         }
 
         if (drug != Drug.NONE){
@@ -244,24 +244,24 @@ public class GameService {
         // 检查发出请求的client是否是预言家
         if(game.getPlayerCharacterMap().get(GlobalData.getUsernameBySession(session)) != Character.PROPHET){
             // 不是预言家
-            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong character",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",false,"Wrong character",null));
             return;
         }
 
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",false,"Wrong target",null));
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("prophet",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",false,"Wrong target",null));
         }
 
         // 获取该角色对应身份
         Character character = game.getPlayerCharacterMap().get(target);
 
-        SendHelper.sendMessageBySession(session,new CommonResp<ProphetResult>("prophet",true,"check finish",new ProphetResult(target,character)));
+        SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",true,"check finish",new ProphetResult(target,character)));
 
         // 至此黑夜结束, 向client发送信息进入白天
         game = wakeUp(gameControl,game);
@@ -288,12 +288,12 @@ public class GameService {
 
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("elect",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("elect",false,"Wrong target",null));
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("elect",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("elect",false,"Wrong target",null));
         }
 
         // 处理投票逻辑
@@ -336,12 +336,12 @@ public class GameService {
 
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("vote",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("vote",false,"Wrong target",null));
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
-            SendHelper.sendMessageBySession(session,new CommonResp("vote",false,"Wrong target",null));
+            SendHelper.sendMessageBySession(session,new CommonResp<>("vote",false,"Wrong target",null));
         }
 
         // 处理投票逻辑

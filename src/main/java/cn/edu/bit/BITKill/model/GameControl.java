@@ -22,8 +22,6 @@ public class GameControl {
     // 使用毒药/解药/不使用
     private Drug drugType;
 
-    private String banishTarget;
-
     public GameControl(long roomID) {
         this.roomID = roomID;
         voteMap = new HashMap<>();
@@ -31,7 +29,7 @@ public class GameControl {
         this.killTarget = "";
         this.witchTarget = "";
         this.drugType = Drug.NONE;
-        this.banishTarget = "";
+    //    this.banishTarget = "";
     }
 
     // 将gameControl设置回默认状态
@@ -41,7 +39,6 @@ public class GameControl {
         this.killTarget = "";
         this.witchTarget = "";
         this.drugType = Drug.NONE;
-        this.banishTarget = "";
     }
 
     // 将两个map都置空
@@ -146,13 +143,5 @@ public class GameControl {
 
     public void setDrugType(Drug drugType) {
         this.drugType = drugType;
-    }
-
-    public String getBanishTarget() {
-        return banishTarget;
-    }
-
-    public void setBanishTarget(String banishTarget) {
-        this.banishTarget = banishTarget;
     }
 }

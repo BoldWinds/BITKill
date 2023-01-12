@@ -19,12 +19,9 @@ public class HeartBeatService {
     @Scheduled(fixedRate = 2000)
     @Async
     public void HeartBeat(){
-        System.out.println(Thread.currentThread().getName());
         if (GlobalData.getUserSessionMap().size() != 0){
             List<String> players = new ArrayList(GlobalData.getUserSessionMap().keySet());
             SendHelper.sendMessageByList(players,new CommonResp<TimeResult>("heartbeat",true,"heartbeat package",new TimeResult(new Date().getTime())));
-        }else{
-            System.out.println("No user online");
         }
     }
 }

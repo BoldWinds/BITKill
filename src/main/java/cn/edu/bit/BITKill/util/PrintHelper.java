@@ -28,6 +28,7 @@ public class PrintHelper {
             stringBuilder.append("\", ");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
