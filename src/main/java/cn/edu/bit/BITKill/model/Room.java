@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
@@ -51,6 +52,17 @@ public class Room {
 
 
     public Room() {
+    }
+
+    public Room(long roomID){
+        this.roomID = roomID;
+        this.creator = "";
+        this.roomName = "undef";
+        this.password = "";
+        this.playerCount = 0;
+        this.players = new ArrayList<>();
+        this.gaming = false;
+        this.full = false;
     }
 
     public Room(long roomID, String creator, String roomName, String password, int playerCount, List<String> players, boolean gaming, boolean full) {
