@@ -4,6 +4,7 @@ import cn.edu.bit.BITKill.dao.UserDaoImpl;
 import cn.edu.bit.BITKill.model.params.CommonParam;
 import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.params.UserParam;
+import cn.edu.bit.BITKill.util.SendHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
@@ -30,15 +31,11 @@ public class RegisterService {
         if(userDaoImpl.saveUser(userParam)){
             //注册成功
             CommonResp<Object> regSucResp = new CommonResp<>("register", true, "Registration successful", null);
-            String regSucRespStr = objectMapper.writeValueAsString(regSucResp);
-            //System.out.println(regSucRespStr);
-            session.sendMessage(new TextMessage(regSucRespStr));
+            SendHelper.sendMessageBySession(session,regSucResp);
         }else{
             //注册失败
             CommonResp<Object> regFailResp = new CommonResp<>("register", false, "Duplicate username", null);
-            String regFailRespStr = objectMapper.writeValueAsString(regFailResp);
-            //System.out.println(regFailRespStr);
-            session.sendMessage(new TextMessage(regFailRespStr));
+            SendHelper.sendMessageBySession(session,regFailResp);
         }
     }
 

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
@@ -78,8 +77,7 @@ public class LoginService {
                 loginResp.setMessage("Already login");
                 break;
         }
-        String loginRespStr = objectMapper.writeValueAsString(loginResp);
-        session.sendMessage(new TextMessage(loginRespStr));
+        SendHelper.sendMessageBySession(session,loginResp);
     }
 
     private int checkLogin(UserParam userParam) {

@@ -49,11 +49,11 @@ public class SendHelper {
             ObjectMapper objectMapper = new ObjectMapper();
             byte[] responseJson = objectMapper.writeValueAsBytes(response);
             session.sendMessage(new TextMessage(responseJson));
-            log.info("send message to session: "+session.getId() + new String(responseJson));
+            System.out.println("send message to session: "+session.getId() + new String(responseJson));
             return true;
         }catch (IOException e){
             e.printStackTrace();
-            log.warn("IOException happens when sending message to session: "+session.getId());
+            System.out.println("IOException happens when sending message to session: "+session.getId());
             return false;
         }
     }

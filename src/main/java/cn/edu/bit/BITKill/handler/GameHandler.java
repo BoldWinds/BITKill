@@ -42,6 +42,7 @@ public class GameHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // 进行具体的消息处理, 包括json解析等
         String paramJson = message.getPayload();
+        System.out.println("Get a request from session "+session.getId()+"  : "+paramJson);
 
         // 进行json解析，得到param
         ObjectMapper objectMapper = new ObjectMapper();
@@ -103,7 +104,7 @@ public class GameHandler extends TextWebSocketHandler {
                     gameService.sendMessage(session,paramJson);
                     break;
                 default:
-                    SendHelper.sendMessageBySession(session,new CommonResp<>("unkonwn request", true,"unkonwn request",null));
+                    SendHelper.sendMessageBySession(session,new CommonResp<>("unknown request", true,"unknown request",null));
             }
         }catch (Exception e) {
             SendHelper.sendMessageBySession(session,new CommonResp());
@@ -115,6 +116,7 @@ public class GameHandler extends TextWebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         log.warn("There is an exception in session: "+session.getId());
+        exception.printStackTrace();
     }
 
     @Override
