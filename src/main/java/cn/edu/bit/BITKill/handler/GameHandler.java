@@ -10,10 +10,13 @@ import cn.edu.bit.BITKill.service.LoginService;
 import cn.edu.bit.BITKill.service.RegisterService;
 import cn.edu.bit.BITKill.service.RoomService;
 import cn.edu.bit.BITKill.util.SendHelper;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import java.io.IOException;
 
 @Slf4j
 public class GameHandler extends TextWebSocketHandler {
@@ -44,13 +47,13 @@ public class GameHandler extends TextWebSocketHandler {
         String paramJson = message.getPayload();
         System.out.println("Get a request from session "+session.getId()+"  : "+paramJson);
 
-        // 进行json解析，得到param
-        ObjectMapper objectMapper = new ObjectMapper();
-        CommonParam param = objectMapper.readValue(paramJson,CommonParam.class);
-
-        // 获取消息类型并进行处理
-        String type = param.getType();
         try{
+            // 进行json解析，得到param
+            ObjectMapper objectMapper = new ObjectMapper();
+            CommonParam param = objectMapper.readValue(paramJson,CommonParam.class);
+
+            // 获取消息类型并进行处理
+            String type = param.getType();
             switch (type){
                 case "register":
                     registerService.register(session,paramJson);
@@ -103,11 +106,22 @@ public class GameHandler extends TextWebSocketHandler {
                 case "last words":
                     gameService.sendMessage(session,paramJson);
                     break;
+                case "new captain":
+                    gameService.newCaptain(session,paramJson);
+                    break;
                 default:
                     SendHelper.sendMessageBySession(session,new CommonResp<>("unknown request", true,"unknown request",null));
             }
-        }catch (Exception e) {
-            SendHelper.sendMessageBySession(session,new CommonResp());
+        }catch (JsonParseException e) {
+            // 单独处理Json转换错误
+            e.printStackTrace();
+            CommonResp commonResp = new CommonResp<>();
+            commonResp.setMessage("There is an error in json parse.");
+            SendHelper.sendMessageBySession(session,commonResp);
+            System.out.println("Json Parse Error!");
+        }catch (IOException e){
+            e.printStackTrace();
+            SendHelper.sendMessageBySession(session,new CommonResp<>());
             log.warn("Something wrong happens!");
         }
 

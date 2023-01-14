@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class RoomService {
 
     @Async
-    public void createRoom(WebSocketSession session, String paramJson) throws Exception
+    public void createRoom(WebSocketSession session, String paramJson) throws IOException
     {
         //Json解析
         ObjectMapper objectMapper = new ObjectMapper();

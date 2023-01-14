@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class GameService {
         Room room = GlobalData.getRoomByID(roomID);
 
         if(room==null){     // roomID错误的情况
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsBytes(new CommonResp<>())));
+            SendHelper.sendMessageBySession(session,new CommonResp<>());
             return;
         }
 
@@ -85,11 +84,13 @@ public class GameService {
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("kill",false,"Wrong target",null));
+            return;
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("kill",false,"Wrong target",null));
+            return;
         }
 
         // 处理投票逻辑
@@ -177,11 +178,13 @@ public class GameService {
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"Wrong target",null));
+            return;
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("witch",false,"Wrong target",null));
+            return;
         }
 
         if (drug != Drug.NONE){
@@ -251,11 +254,13 @@ public class GameService {
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",false,"Wrong target",null));
+            return;
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("prophet",false,"Wrong target",null));
+            return;
         }
 
         // 获取该角色对应身份
@@ -289,11 +294,13 @@ public class GameService {
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("elect",false,"Wrong target",null));
+            return;
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("elect",false,"Wrong target",null));
+            return;
         }
 
         // 处理投票逻辑
@@ -337,11 +344,13 @@ public class GameService {
         // target是否在这场游戏里
         if (!game.getPlayers().contains(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("vote",false,"Wrong target",null));
+            return;
         }
 
         // target是否存活
         if (!game.getPlayerStateMap().get(target)){
             SendHelper.sendMessageBySession(session,new CommonResp<>("vote",false,"Wrong target",null));
+            return;
         }
 
         // 处理投票逻辑
@@ -355,7 +364,7 @@ public class GameService {
             // 投票完成
             String result = gameControl.getVoteResult();
             boolean tie = gameControl.isTie();
-           //gameControl.setBanishTarget(result);
+            //gameControl.setBanishTarget(result);
             game.playerDie(result);
             // 告知所有人放逐投票完成
             if(!SendHelper.sendMessageByList(game.getPlayers(),new CommonResp<>("vote",true,"vote result",new VoteResult(tie,result,gameControl.getVoterTargetMap())))){
@@ -409,19 +418,67 @@ public class GameService {
         }
     }
 
+    @Async
+    public void newCaptain(WebSocketSession session,String paramJson) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        RoomUserParam roomUserParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<RoomUserParam>>(){}).getContent();
+
+        long roomID = roomUserParam.getRoomID();
+        String target = roomUserParam.getUsername();
+
+        Game game = GlobalData.getGameByID(roomID);
+        GameControl gameControl = GlobalData.getGameControlByID(roomID);
+
+        // target是否在这场游戏里
+        if (!game.getPlayers().contains(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp<>("new captain",false,"Wrong target",null));
+            return;
+        }
+
+        // target是否存活
+        if (!game.getPlayerStateMap().get(target)){
+            SendHelper.sendMessageBySession(session,new CommonResp<>("new captain",false,"Wrong target",null));
+            return;
+        }
+
+        game.setCaptain(target);
+        GlobalData.writeBack(roomID,game,gameControl);
+
+        CommonResp<RoomUserParam> resp = new CommonResp<>("new captain",true,"Old captain hand over the police badge to new captain.",new RoomUserParam(game.roomID, target));
+        if (!SendHelper.sendMessageByList(game.getPlayers(),resp)){
+            // 发送失败
+            SendHelper.sendMessageBySession(session,new CommonResp<>());
+        }
+
+    }
+
     // 夜晚结束，更新game
     private Game wakeUp(GameControl gameControl,Game game) {
+        boolean captainDie = false;
+        String captain = game.getCaptain();
         // 更新夜晚所作的事情对游戏产生的影响
         if (gameControl.getDrugType() == Drug.POISON) {
             // 女巫使用毒药
             game.playerDie(gameControl.getKillTarget());
             game.playerDie(gameControl.getWitchTarget());
+            captainDie = gameControl.getKillTarget().equals(game.getCaptain()) || gameControl.getWitchTarget().equals(game.getCaptain());
         } else if (gameControl.getDrugType() == Drug.ANTIDOTE && gameControl.getKillTarget().equals(gameControl.getDrugTarget())) {
             // 女巫使用解药,无人死亡
         } else {
             // 女巫不使用药品,狼人击杀目标
             game.playerDie(gameControl.getKillTarget());
+            if (gameControl.getKillTarget().equals(game.getCaptain())){
+                // 死的人有captain
+                captainDie = gameControl.getKillTarget().equals(game.getCaptain());
+            }
         }
+
+        if (captainDie && !game.isElectCaptain()){
+            // captain死了，需要换新的
+            CommonResp commonResp = new CommonResp<>("captain die", true,"Please hand over the police badge.",null);
+            SendHelper.sendMessageByUsername(captain,commonResp);
+        }
+
         // 设置下一个状态
         if(game.isElectCaptain()){
             game.setGameState(GameState.ELECT);

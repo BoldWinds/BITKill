@@ -28,6 +28,11 @@ public class RegisterService {
         ObjectMapper objectMapper = new ObjectMapper();
         CommonParam<UserParam> registerCommonParam = objectMapper.readValue(paramJson, new TypeReference<CommonParam<UserParam>>(){});
         UserParam userParam = registerCommonParam.getContent();
+        if (userParam.getUsername().equals("")){
+            // 不能起空字符串作为用户名
+            CommonResp<Object> regFailResp = new CommonResp<>("register", false, "Can not use this username", null);
+            SendHelper.sendMessageBySession(session,regFailResp);
+        }
         if(userDaoImpl.saveUser(userParam)){
             //注册成功
             CommonResp<Object> regSucResp = new CommonResp<>("register", true, "Registration successful", null);

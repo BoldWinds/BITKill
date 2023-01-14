@@ -2,6 +2,7 @@ package cn.edu.bit.BITKill.util;
 
 import cn.edu.bit.BITKill.model.params.CommonResp;
 import cn.edu.bit.BITKill.model.GlobalData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
@@ -80,7 +81,13 @@ public class SendHelper {
         return true;
     }
 
-    public static void sendErrorMessage(WebSocketSession session) throws IOException {
-        session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsBytes(new CommonResp<>())));
+    public static void sendErrorMessage(WebSocketSession session){
+        try {
+            session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsBytes(new CommonResp<>())));
+        }catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("There is error in sending error message");
+        }
+
     }
 }
