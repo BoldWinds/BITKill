@@ -1,4 +1,4 @@
-package cn.edu.bit.BITKill.config;
+package cn.edu.bit.BITKill.handler;
 
 import cn.edu.bit.BITKill.handler.GameHandler;
 import cn.edu.bit.BITKill.service.GameService;
